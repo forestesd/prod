@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "PROD"
 include(":app")
- 
+include(":ui")
+include(":navigation")
