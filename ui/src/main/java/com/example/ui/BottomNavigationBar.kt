@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomNavigationBar(onNavigate: (String) -> Unit) {
@@ -28,7 +29,8 @@ fun BottomNavigationBar(onNavigate: (String) -> Unit) {
         bottomBar = {
             BottomNavigation(
                 modifier = Modifier.navigationBarsPadding(),
-                backgroundColor = Color.Blue.copy(alpha = 0.5f)
+                backgroundColor = Color.White.copy(alpha = 0.5f),
+                elevation = 0.dp
             ) {
                 BottomNavigationItem(
                     selected = selectedItem == 0,
@@ -63,10 +65,7 @@ fun BottomNavigationBar(onNavigate: (String) -> Unit) {
 
         },
         content = {
-            Text(
-                text = "Выберите вкладку",
-                modifier = Modifier.padding(it)
-            )
+
         }
     )
 
