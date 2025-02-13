@@ -41,7 +41,7 @@ android {
 
 dependencies {
     implementation(project(":navigation"))
-    implementation(project(":ui"))
+    implementation(project(":navBarUI"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
