@@ -1,6 +1,5 @@
 package com.example.apis
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,13 +18,22 @@ class NewsViewModel @Inject constructor(
 
     fun loadNews() {
         viewModelScope.launch {
-            Log.i("INFO", "Calling getNews()")
+
+            _news.value = repository.getCachedNews()
+
             repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg").let { newsList ->
+
                 _news.value = newsList.map { newsItem ->
+
                     newsItem.copy(
                         published_date = try {
-                            LocalDate.parse(newsItem.published_date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).format( DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                        }catch (e: Exception){
+
+                            LocalDate.parse(
+                                newsItem.published_date,
+                                DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                            ).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+
+                        } catch (e: Exception) {
                             newsItem.published_date
                         }
                     )
@@ -40,7 +48,7 @@ class NewsViewModel @Inject constructor(
 }
 
 class NewsViewModelFactory(private val repository: NewsRepository) : ViewModelProvider.Factory {
-   override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(NewsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return NewsViewModel(repository) as T

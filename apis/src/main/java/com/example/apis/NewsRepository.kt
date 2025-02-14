@@ -1,13 +1,16 @@
 package com.example.apis
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import retrofit2.HttpException
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(
     private val api: TimesApiService
 ) {
-    private var cachedNews: List<Article>? = null
+    private var cachedNews = mutableStateOf<List<Article>>(emptyList())
 
     suspend fun getNews(
         source: String,
@@ -15,15 +18,22 @@ class NewsRepository @Inject constructor(
         apiKey: String
     ): List<Article> {
 
-        try {
+        return try {
+
             val response = api.getNews(source, section, apiKey)
-            Log.i("INFO", "Response: ${response.results}")
-            cachedNews = response.results
-            return response.results
-        }catch (e: Exception) {
+
+            cachedNews.value = response.results
+            response.results
+
+        } catch (e: Exception) {
             Log.e("ERROR", "Error fetching news: ${e.message}")
-            throw e
+            cachedNews.value
         }
 
+
+    }
+
+    fun getCachedNews(): List<Article>{
+        return cachedNews.value
     }
 }

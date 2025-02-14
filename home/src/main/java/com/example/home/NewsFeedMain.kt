@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -36,8 +37,8 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
         contentPadding = PaddingValues(16.dp),
 
         ) {
-        items(news.size) { item ->
-            val imageUrl = viewModel.getImageUrlForArticle(news[item])
+        items(news, key = { item -> item.title}) { item ->
+            val imageUrl = viewModel.getImageUrlForArticle(item)
 
             Card(
                 modifier = Modifier
@@ -54,8 +55,8 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
 
                     ) {
 
-                    NewsMain(news[item], imageUrl)
-                    PublishedSource(news[item])
+                    NewsMain(item, imageUrl)
+                    PublishedSource(item)
                 }
 
             }
