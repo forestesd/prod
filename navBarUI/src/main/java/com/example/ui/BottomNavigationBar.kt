@@ -21,7 +21,7 @@ fun BottomNavigationBar(
 ) {
     NavigationBar(
         modifier = Modifier.navigationBarsPadding(),
-        containerColor = Color.White.copy(alpha = 0.5f)
+        containerColor = Color.White
     ) {
         NavigationBarItem(
             selected = selectedItem == 0,

@@ -38,6 +38,9 @@ android {
 
 dependencies {
     implementation(project(":apis"))
+
+    implementation("io.coil-kt:coil-compose:2.1.0")
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3.material3)
     implementation(libs.ui)
