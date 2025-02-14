@@ -51,9 +51,18 @@ fun MainScreen(newsRepository: NewsRepository) {
         Row(
             modifier = Modifier.fillMaxWidth().height(150.dp)
         ) {
-            Spacer(modifier = Modifier.fillMaxSize())
+            Card(
+                modifier = Modifier.fillMaxWidth().height(150.dp)
+            ) {
+
+            }
         }
-        NewsFeedMain(news, viewModel)
+        if (viewModel.isLoading.value){
+            ProgressBar()
+        }else{
+            NewsFeedMain(news, viewModel)
+        }
+
     }
 
 

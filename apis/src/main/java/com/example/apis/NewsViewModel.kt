@@ -16,29 +16,41 @@ class NewsViewModel @Inject constructor(
     private val _news = mutableStateOf<List<Article>>(emptyList())
     val news: State<List<Article>> = _news
 
+    private var _isLoading = mutableStateOf(true)
+    val isLoading: State<Boolean> = _isLoading
+
     fun loadNews() {
         viewModelScope.launch {
+            if (_news.value.isEmpty()) {
+                _isLoading.value = true
 
-            _news.value = repository.getCachedNews()
+                _news.value = repository.getCachedNews()
 
-            repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg").let { newsList ->
+                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                    .let { newsList ->
 
-                _news.value = newsList.map { newsItem ->
+                        _news.value = newsList.map { newsItem ->
 
-                    newsItem.copy(
-                        published_date = try {
+                            newsItem.copy(
+                                published_date = try {
 
-                            LocalDate.parse(
-                                newsItem.published_date,
-                                DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                            ).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                    LocalDate.parse(
+                                        newsItem.published_date,
+                                        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                                    ).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
 
-                        } catch (e: Exception) {
-                            newsItem.published_date
-                        }
-                    )
-                }.filter { it.abstract != "" }
+                                } catch (e: Exception) {
+                                    newsItem.published_date
+                                }
+                            )
+                        }.filter { it.abstract != "" }
+                    }
+                _isLoading.value =false
+            }else{
+                _news.value = repository.getCachedNews()
+                _isLoading.value = false
             }
+
         }
     }
 
