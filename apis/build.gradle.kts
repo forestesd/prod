@@ -1,11 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    id ("kotlin-kapt")
 }
 
 android {
-    namespace = "com.example.home"
+    namespace = "com.example.apis"
     compileSdk = 34
 
     defaultConfig {
@@ -24,9 +24,6 @@ android {
             )
         }
     }
-    buildFeatures{
-        compose = true
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -34,15 +31,28 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-}
 
+}
+kapt{
+    correctErrorTypes = true
+}
 dependencies {
-    implementation(project(":apis"))
+
+    implementation ("com.google.dagger:dagger:2.42")
+    kapt ("com.google.dagger:dagger-compiler:2.42")
+
+
+    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    kapt ("androidx.hilt:hilt-compiler:1.0.0")
+
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.material3.material3)
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.core:core-ktx:1.12.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.apis.NewsRepository
+import com.example.home.MainScreen
 import com.example.ui.FinanceScreen
 import com.example.ui.NavigationUI
 import com.example.ui.Newsfeed
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(newsRepository: NewsRepository) {
 
     val navController = rememberNavController()
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -44,6 +46,7 @@ fun AppNavigation() {
         ) {
             composable("main") {
 
+                MainScreen(newsRepository)
             }
             composable("finance") {
                 FinanceScreen()

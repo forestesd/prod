@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -38,10 +39,24 @@ android {
         compose = true
     }
 }
+kapt{
+    correctErrorTypes = true
+}
+
 
 dependencies {
     implementation(project(":navigation"))
-    implementation(project(":navBarUI"))
+    implementation(project(":apis"))
+
+    implementation ("com.google.dagger:dagger:2.50")
+    kapt ("com.google.dagger:dagger-compiler:2.50")
+
+    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    kapt ("androidx.hilt:hilt-compiler:1.0.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

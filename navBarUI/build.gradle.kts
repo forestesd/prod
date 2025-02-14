@@ -43,7 +43,6 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.appcompat)
-    implementation("androidx.compose.material:material:1.6.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
