@@ -19,22 +19,30 @@ import com.example.apis.NewsViewModel
 import com.example.apis.NewsViewModelFactory
 import com.example.home.NewsFeed.NewsFeedMain
 import com.example.home.NewsFeed.ProgressBar
+import com.example.tickersapi.TickersRepository
+import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.TickersViewModelFactory
 
 @Composable
 fun MainScreen(
     newsRepository: NewsRepository,
-    onCardClicked: (String) -> Unit
+    onCardClicked: (String) -> Unit,
+    tickersRepository: TickersRepository
 
 ) {
-    val factory = NewsViewModelFactory(newsRepository)
-    val viewModel: NewsViewModel = viewModel(factory = factory)
+    val newsViewModelFactory = NewsViewModelFactory(newsRepository)
+    val tickersViewModelFactory = TickersViewModelFactory(tickersRepository)
+    val newsViewModel: NewsViewModel = viewModel(factory = newsViewModelFactory)
+    val tickersViewModel: TickersViewModel = viewModel(factory = tickersViewModelFactory)
 
 
     LaunchedEffect(Unit) {
-        viewModel.loadNews()
+        newsViewModel.loadNews()
+        tickersViewModel.loadTickers()
     }
 
-    val news by viewModel.news
+    val news by newsViewModel.news
+    val tickers by tickersViewModel.tickers
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -49,10 +57,10 @@ fun MainScreen(
 
             }
         }
-        if (viewModel.isLoading.value){
+        if (newsViewModel.isLoading.value){
             ProgressBar()
         }else{
-            NewsFeedMain(news, viewModel, onCardClicked)
+            NewsFeedMain(news, newsViewModel, onCardClicked)
         }
 
     }

@@ -43,6 +43,8 @@ dependencies {
     implementation(project(":navBarUI"))
     implementation(project(":home"))
     implementation(project(":NewYorkTimesApi"))
+    implementation(project(":tickersApi"))
+
     implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation(libs.androidx.navigation.compose)

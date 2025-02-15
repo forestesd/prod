@@ -8,5 +8,11 @@ interface TickersApiService {
     suspend fun getInfoTicker(
         @Query("symbol") symbol: String,
         @Query("token") token: String
-    )
+    ): StockQuote
+
+    @GET("stock/profile2")
+    suspend fun getCompanyInfo(
+        @Query("symbol") symbol: String,
+        @Query("token") token: String
+    ): CompanyProfileResponse
 }

@@ -5,12 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
+import com.example.apis.NewsRepository
+import com.example.apis.NewsViewModel
 import com.example.navigation.AppNavigation
+import com.example.tickersapi.TickersRepository
+import com.example.tickersapi.TickersViewModel
+import javax.inject.Inject
 
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var appComponent: AppComponent
+    @Inject lateinit var newsRepository: NewsRepository
+    @Inject lateinit var tickersRepository: TickersRepository
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,12 +24,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        appComponent = DaggerAppComponent.builder()
-            .timesApiModule(TimesApiModule())
-            .build()
-        val newsRepository = appComponent.getNewsRepository()
         setContent {
-            AppNavigation(newsRepository)
+            AppNavigation(newsRepository, tickersRepository)
         }
     }
 }

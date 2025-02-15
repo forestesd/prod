@@ -47,6 +47,7 @@ kapt{
 dependencies {
     implementation(project(":navigation"))
     implementation(project(":NewYorkTimesApi"))
+    implementation(project(":tickersApi"))
 
     implementation ("com.google.dagger:dagger:2.50")
     kapt ("com.google.dagger:dagger-compiler:2.50")

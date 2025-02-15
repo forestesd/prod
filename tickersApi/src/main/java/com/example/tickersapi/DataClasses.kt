@@ -7,3 +7,18 @@ data class StockQuote(
     val o: Float, // Цена открытия
     val pc: Float // Цена закрытия предыдущего дня
 )
+data class CompanyProfileResponse(
+    val name: String?,
+    val logo: String?,
+    val weburl: String?,
+    val ticker: String?
+)
+
+data class TickerUi(
+    val name: String,
+    val logoUrl: String,
+    val price: Float,
+    val priceChangePercent: Float,
+    val isUp: Boolean,
+    val priceColor: Int,
+)

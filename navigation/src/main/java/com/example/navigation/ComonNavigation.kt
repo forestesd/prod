@@ -14,12 +14,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.apis.NewsRepository
 import com.example.home.MainScreen
 import com.example.home.NewsFeed.WebViewNews
+import com.example.tickersapi.TickersRepository
 import com.example.ui.FinanceScreen
 import com.example.ui.NavigationUI
 import com.example.ui.Newsfeed
 
 @Composable
-fun AppNavigation(newsRepository: NewsRepository) {
+fun AppNavigation(newsRepository: NewsRepository, tickersRepository: TickersRepository) {
 
     val navController = rememberNavController()
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -50,7 +51,7 @@ fun AppNavigation(newsRepository: NewsRepository) {
                 MainScreen(newsRepository, {
                     val encodeUrl = Uri.encode(it)
                     navController.navigate("webViewNews/$encodeUrl")
-                })
+                }, tickersRepository)
             }
             composable("webViewNews/{url}") {
                 val decodeUrl = it.arguments?.getString("url").toString()

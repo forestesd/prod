@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -32,9 +33,13 @@ android {
     }
 
 }
-
+kapt{
+    correctErrorTypes = true
+}
 dependencies {
 
+    implementation ("com.google.dagger:dagger:2.42")
+    kapt ("com.google.dagger:dagger-compiler:2.42")
 
 
     implementation(platform(libs.androidx.compose.bom))

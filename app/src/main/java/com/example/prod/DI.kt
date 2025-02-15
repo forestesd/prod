@@ -4,6 +4,10 @@ import com.example.apis.NewsRepository
 import com.example.apis.NewsViewModel
 import com.example.apis.RetrofitTimesInstance
 import com.example.apis.TimesApiService
+import com.example.tickersapi.RetrofitTickersInstance
+import com.example.tickersapi.TickersApiService
+import com.example.tickersapi.TickersRepository
+import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -31,15 +35,24 @@ class TimesApiModule {
     }
 
 }
-@Singleton
-@Component(modules = [TimesApiModule::class])
-interface AppComponent {
-
-    fun inject(app: MainActivity)
 
 
-    fun inject(viewModel: NewsViewModel)
+@Module
+@InstallIn(SingletonComponent::class)
+class TickersApiModel{
 
-    fun getNewsRepository(): NewsRepository
-    fun getNewsViewModel(): NewsViewModel
+    @Provides
+    fun provideTickersApiService(): TickersApiService{
+        return RetrofitTickersInstance.api
+    }
+
+    @Provides
+    fun provideTickersRepository(api: TickersApiService):TickersRepository{
+        return TickersRepository(api)
+    }
+
+    @Provides
+    fun provideTickersViewModel(repositiry: TickersRepository): TickersViewModel{
+        return TickersViewModel(repositiry)
+    }
 }

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -32,7 +33,15 @@ android {
     }
 }
 
+kapt{
+    correctErrorTypes = true
+}
+
 dependencies {
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation ("com.google.dagger:dagger:2.42")
+    kapt ("com.google.dagger:dagger-compiler:2.42")
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
