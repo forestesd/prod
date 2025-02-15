@@ -1,6 +1,6 @@
 package com.example.home
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.apis.Article
 import com.example.apis.NewsViewModel
 
@@ -65,6 +67,34 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
     }
 }
 
+@Composable
+fun NewsMain(newsItem: Article, imageUrl: String?) {
+    AsyncImage(
+        model = imageUrl,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(PxToDp(400f))
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.Gray),
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.drawable.placeholder),
+        contentDescription = "News Image"
+    )
+
+    Text(
+        text = newsItem.title,
+        modifier = Modifier.padding(top = 10.dp),
+        fontSize = 16.sp,
+
+        )
+
+    Text(
+        text = newsItem.abstract,
+        modifier = Modifier.padding(top = 12.dp),
+        fontSize = 12.sp
+    )
+}
+
 
 @Composable
 fun PublishedSource(newsItem: Article) {
@@ -90,28 +120,3 @@ fun PublishedSource(newsItem: Article) {
     }
 }
 
-@Composable
-fun NewsMain(newsItem: Article, imageUrl: String?) {
-    Image(
-        painter = rememberAsyncImagePainter(imageUrl ?: R.drawable.placeholder),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(PxToDp(400f))
-            .clip(RoundedCornerShape(12.dp)),
-        contentScale = ContentScale.Crop,
-        contentDescription = "News Image"
-    )
-
-    Text(
-        text = newsItem.title,
-        modifier = Modifier.padding(top = 10.dp),
-        fontSize = 16.sp,
-
-        )
-
-    Text(
-        text = newsItem.abstract,
-        modifier = Modifier.padding(top = 12.dp),
-        fontSize = 12.sp
-    )
-}
