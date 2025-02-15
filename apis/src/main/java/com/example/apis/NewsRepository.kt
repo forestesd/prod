@@ -1,10 +1,7 @@
 package com.example.apis
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import retrofit2.HttpException
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(

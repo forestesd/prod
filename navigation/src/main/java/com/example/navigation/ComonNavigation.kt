@@ -1,5 +1,6 @@
 package com.example.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.apis.NewsRepository
 import com.example.home.MainScreen
+import com.example.home.WebViewNews
 import com.example.ui.FinanceScreen
 import com.example.ui.NavigationUI
 import com.example.ui.Newsfeed
@@ -45,8 +47,14 @@ fun AppNavigation(newsRepository: NewsRepository) {
 
         ) {
             composable("main") {
-
-                MainScreen(newsRepository)
+                MainScreen(newsRepository, {
+                    val encodeUrl = Uri.encode(it)
+                    navController.navigate("webViewNews/$encodeUrl")
+                })
+            }
+            composable("webViewNews/{url}") {
+                val decodeUrl = it.arguments?.getString("url").toString()
+                WebViewNews(decodeUrl,{navController.navigate("main")})
             }
             composable("finance") {
                 FinanceScreen()

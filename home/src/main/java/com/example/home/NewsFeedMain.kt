@@ -31,7 +31,7 @@ import com.example.apis.Article
 import com.example.apis.NewsViewModel
 
 @Composable
-fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
+fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel,  onCardClicked: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,6 +47,7 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
                     .fillMaxWidth()
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(12.dp),
+                onClick = {onCardClicked(item.url)}
             ) {
                 Column(
                     modifier = Modifier
@@ -69,6 +70,7 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel) {
 
 @Composable
 fun NewsMain(newsItem: Article, imageUrl: String?) {
+
     AsyncImage(
         model = imageUrl,
         modifier = Modifier
