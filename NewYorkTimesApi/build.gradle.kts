@@ -1,15 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    id ("kotlin-kapt")
+}
 
-}
-kapt{
-    correctErrorTypes = true
-}
 android {
-    namespace = "com.example.navigation"
+    namespace = "com.example.apis"
     compileSdk = 34
 
     defaultConfig {
@@ -18,9 +13,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-    buildFeatures {
-        compose = true
-    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -37,15 +30,21 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
 }
 
 dependencies {
-    implementation(project(":navBarUI"))
-    implementation(project(":home"))
-    implementation(project(":NewYorkTimesApi"))
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    kapt ("androidx.hilt:hilt-compiler:1.0.0")
-    implementation(libs.androidx.navigation.compose)
+
+
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.core:core-ktx:1.12.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

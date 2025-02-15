@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.apis.NewsRepository
 import com.example.home.MainScreen
-import com.example.home.WebViewNews
+import com.example.home.NewsFeed.WebViewNews
 import com.example.ui.FinanceScreen
 import com.example.ui.NavigationUI
 import com.example.ui.Newsfeed

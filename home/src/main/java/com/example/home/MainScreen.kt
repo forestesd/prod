@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.apis.NewsRepository
 import com.example.apis.NewsViewModel
 import com.example.apis.NewsViewModelFactory
+import com.example.home.NewsFeed.NewsFeedMain
+import com.example.home.NewsFeed.ProgressBar
 
 @Composable
 fun MainScreen(

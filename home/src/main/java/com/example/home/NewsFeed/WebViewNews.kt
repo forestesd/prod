@@ -1,4 +1,4 @@
-package com.example.home
+package com.example.home.NewsFeed
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -20,6 +20,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebViewNews(url: String, onBack: () -> Unit) {
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -40,12 +41,15 @@ fun WebViewNews(url: String, onBack: () -> Unit) {
         AndroidView(
             factory = { context ->
                 WebView(context).apply {
-                    settings.javaScriptEnabled
+                    settings.javaScriptEnabled = true
                     webViewClient = WebViewClient()
                     loadUrl(url)
                 }
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
+
     }
+
+
 }

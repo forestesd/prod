@@ -37,8 +37,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":apis"))
 
+    implementation(project(":NewYorkTimesApi"))
     implementation("io.coil-kt:coil-compose:2.1.0")
 
     implementation(platform(libs.androidx.compose.bom))

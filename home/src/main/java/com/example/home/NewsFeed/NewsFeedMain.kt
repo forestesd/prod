@@ -1,4 +1,4 @@
-package com.example.home
+package com.example.home.NewsFeed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.apis.Article
 import com.example.apis.NewsViewModel
+import com.example.home.PxToDp
+import com.example.home.R
 
 @Composable
 fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel,  onCardClicked: (String) -> Unit) {
