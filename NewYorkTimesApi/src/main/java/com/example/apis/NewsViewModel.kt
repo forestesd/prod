@@ -3,13 +3,14 @@ package com.example.apis
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+@HiltViewModel
 class NewsViewModel @Inject constructor(
     private val repository: NewsRepository
 ) : ViewModel() {
@@ -59,13 +60,5 @@ class NewsViewModel @Inject constructor(
     }
 }
 
-class NewsViewModelFactory(private val repository: NewsRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NewsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return NewsViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+
 

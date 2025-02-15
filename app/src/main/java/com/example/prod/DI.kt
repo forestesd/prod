@@ -11,25 +11,25 @@ import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
 class TimesApiModule {
 
     @Provides
+    @Singleton
     fun provideTimesApiService(): TimesApiService {
         return RetrofitTimesInstance.api
     }
 
     @Provides
+    @Singleton
     fun provideNewsRepository(api: TimesApiService): NewsRepository {
         return NewsRepository(api)
     }
 
     @Provides
+    @Singleton
     fun provideNewsViewModel(repository: NewsRepository): NewsViewModel {
         return NewsViewModel(repository)
     }
@@ -38,21 +38,29 @@ class TimesApiModule {
 
 
 @Module
-@InstallIn(SingletonComponent::class)
 class TickersApiModel{
 
     @Provides
+    @Singleton
     fun provideTickersApiService(): TickersApiService{
         return RetrofitTickersInstance.api
     }
 
     @Provides
+    @Singleton
     fun provideTickersRepository(api: TickersApiService):TickersRepository{
         return TickersRepository(api)
     }
 
     @Provides
+    @Singleton
     fun provideTickersViewModel(repositiry: TickersRepository): TickersViewModel{
         return TickersViewModel(repositiry)
     }
+}
+
+@Component(modules = [TimesApiModule::class, TickersApiModel::class])
+@Singleton
+interface AppComponent {
+    fun inject(activity: MainActivity)
 }

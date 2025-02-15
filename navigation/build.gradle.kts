@@ -3,10 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id ("kotlin-kapt")
-
 }
 kapt{
     correctErrorTypes = true
+
 }
 android {
     namespace = "com.example.navigation"
@@ -45,8 +45,6 @@ dependencies {
     implementation(project(":NewYorkTimesApi"))
     implementation(project(":tickersApi"))
 
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.appcompat)

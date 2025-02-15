@@ -41,6 +41,7 @@ android {
 }
 kapt{
     correctErrorTypes = true
+    generateStubs = true
 }
 
 
@@ -49,11 +50,9 @@ dependencies {
     implementation(project(":NewYorkTimesApi"))
     implementation(project(":tickersApi"))
 
-    implementation ("com.google.dagger:dagger:2.50")
-    kapt ("com.google.dagger:dagger-compiler:2.50")
+    implementation ("com.google.dagger:dagger:2.48")
+    kapt ("com.google.dagger:dagger-compiler:2.48")
 
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    kapt ("androidx.hilt:hilt-compiler:1.0.0")
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")

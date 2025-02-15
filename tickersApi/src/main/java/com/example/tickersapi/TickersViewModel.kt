@@ -3,11 +3,12 @@ package com.example.tickersapi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class TickersViewModel @Inject constructor(
     private val repository: TickersRepository
 ): ViewModel() {
@@ -21,20 +22,9 @@ class TickersViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
 
-            _tickers.value = repository.getCompanyInfo("cuo2b81r01qokt74hgsgcuo2b81r01qokt74hgt0")
+            _tickers.value = repository.getCompanyInfo("cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
 
             _isLoading.value = false
         }
-    }
-}
-
-
-class TickersViewModelFactory(private val repository: TickersRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TickersViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TickersViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
