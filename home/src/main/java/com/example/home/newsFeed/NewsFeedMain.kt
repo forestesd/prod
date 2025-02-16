@@ -28,12 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.apis.Article
+import com.example.apis.Docs
 import com.example.apis.NewsViewModel
 import com.example.home.PxToDp
 import com.example.home.R
 
 @Composable
-fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel,  onCardClicked: (String) -> Unit) {
+fun <T> NewsFeedMain(news: List<T>, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,29 +42,28 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel,  onCardClicked: 
         contentPadding = PaddingValues(16.dp),
 
         ) {
-        items(news, key = { item -> item.title}) { item ->
-            val imageUrl = viewModel.getImageUrlForArticle(item)
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                shape = RoundedCornerShape(12.dp),
-                onClick = {onCardClicked(item.url)}
+        items(news, key = { item ->
+            when (item) {
+                is Article -> item.title
+                is Docs -> item.web_url
+                else -> "Unknown"
+            }
+        }) { item ->
+            NewsCrad(
+                when (item) {
+                    is Article -> item
+                    is Docs -> item
+                    else -> "Unknown"
+                }, viewModel
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                onCardClicked(
+                    when (item) {
+                        is Article -> item.url
+                        is Docs -> item.web_url
+                        else -> "Unknown"
+                    }.toString()
 
-                    ) {
-
-                    NewsMain(item, imageUrl)
-                    PublishedSource(item)
-                }
-
+                )
             }
 
         }
@@ -71,7 +71,51 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel,  onCardClicked: 
 }
 
 @Composable
-fun NewsMain(newsItem: Article, imageUrl: String?) {
+fun <T> NewsCrad(item: T, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
+    val imageUrl = when (item) {
+        is Article -> viewModel.getImageUrlForArticle(item)
+        is Docs -> viewModel.getImageUrlForDocs(item)
+        else -> null
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        shape = RoundedCornerShape(12.dp),
+        onClick = {
+
+            when (item) {
+                is Article -> item.url
+                is Docs -> item.web_url
+                else -> "Unknown"
+            }.let {
+                onCardClicked(
+                    it
+                )
+
+            }
+
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+
+            NewsMain(item, imageUrl)
+            PublishedSource(item)
+        }
+
+    }
+}
+
+@Composable
+fun <T> NewsMain(newsItem: T, imageUrl: String?) {
 
     AsyncImage(
         model = imageUrl,
@@ -85,30 +129,52 @@ fun NewsMain(newsItem: Article, imageUrl: String?) {
         contentDescription = "News Image"
     )
 
-    Text(
-        text = newsItem.title,
+    when (newsItem) {
+        is Article -> newsItem.title
+        is Docs -> newsItem.headline?.main
+        else -> "Unknown"
+    }?.let {
+        Text(
+        text = it,
         modifier = Modifier.padding(top = 10.dp),
         fontSize = 16.sp,
 
         )
+    }
 
-    Text(
-        text = newsItem.abstract,
-        modifier = Modifier.padding(top = 12.dp),
-        fontSize = 12.sp
-    )
+    when (newsItem) {
+        is Article -> newsItem.abstract
+        is Docs -> newsItem.abstract
+        else-> "Unknown"
+    }.let {
+        Text(
+            text = it,
+            modifier = Modifier.padding(top = 12.dp),
+            fontSize = 12.sp
+        )
+    }
 }
 
 
 @Composable
-fun PublishedSource(newsItem: Article) {
+fun <T> PublishedSource(newsItem: T) {
     Row(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 12.dp),
     ) {
         Text(
-            text = "${newsItem.source} • ${newsItem.subsection}",
+            text = "${
+                when (newsItem) {
+                    is Article -> newsItem.source
+                    is Docs -> newsItem.source
+                    else -> "Unknown"
+                }
+            } • ${ when (newsItem) {
+                is Article -> newsItem.subsection
+                is Docs -> newsItem.subsection_name ?: ""
+                else -> "Unknown"
+            }}",
             fontSize = 10.sp
         )
         Spacer(
@@ -116,10 +182,16 @@ fun PublishedSource(newsItem: Article) {
                 .weight(1f)
                 .width(0.dp)
         )
-        Text(
-            text = newsItem.published_date,
-            fontSize = 10.sp
-        )
+        when (newsItem) {
+            is Article -> newsItem.published_date
+            is Docs -> newsItem.pub_date
+            else -> "Unknown"
+        }.let {
+            Text(
+                text = it,
+                fontSize = 10.sp
+            )
+        }
 
     }
 }

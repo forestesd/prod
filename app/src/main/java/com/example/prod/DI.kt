@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.example.apis.NewsRepository
 import com.example.apis.NewsViewModel
+import com.example.apis.RetrofitSearchTimesInstance
 import com.example.apis.RetrofitTimesInstance
 import com.example.apis.TimesApiService
 import com.example.tickersapi.RetrofitTickersInstance
@@ -13,6 +14,7 @@ import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -20,14 +22,25 @@ class TimesApiModule {
 
     @Provides
     @Singleton
+    @Named("newsApi")
     fun provideTimesApiService(): TimesApiService {
         return RetrofitTimesInstance.api
     }
 
     @Provides
     @Singleton
-    fun provideNewsRepository(api: TimesApiService): NewsRepository {
-        return NewsRepository(api)
+    @Named("searchApi")
+    fun provideSearchApiService(): TimesApiService {
+        return RetrofitSearchTimesInstance.api
+    }
+
+    @Provides
+    @Singleton
+    fun provideNewsRepository(
+        @Named("newsApi") timesApiService: TimesApiService,
+        @Named("searchApi") searchApiService: TimesApiService
+    ): NewsRepository {
+        return NewsRepository(timesApiService, searchApiService)
     }
 
     @Provides
@@ -40,25 +53,26 @@ class TimesApiModule {
 
 
 @Module
-class TickersApiModel{
+class TickersApiModel {
     @Provides
     @Singleton
-    fun provideTickersApiService(): TickersApiService{
+    fun provideTickersApiService(): TickersApiService {
         return RetrofitTickersInstance.api
     }
 
     @Provides
     @Singleton
-    fun provideTickersRepository(api: TickersApiService, context: Context):TickersRepository{
+    fun provideTickersRepository(api: TickersApiService, context: Context): TickersRepository {
         return TickersRepository(context, api)
     }
 
     @Provides
     @Singleton
-    fun provideTickersViewModel(repository: TickersRepository): TickersViewModel{
+    fun provideTickersViewModel(repository: TickersRepository): TickersViewModel {
         return TickersViewModel(repository)
     }
 }
+
 @Module
 class AppModule(private val application: Application) {
     @Provides
@@ -69,8 +83,12 @@ class AppModule(private val application: Application) {
     @Singleton
     fun provideContext(): Context = application.applicationContext
 }
+
 @Component(modules = [TimesApiModule::class, TickersApiModel::class, AppModule::class])
 @Singleton
 interface AppComponent {
     fun inject(activity: MainActivity)
+
+    fun inject(newsViewModel: NewsViewModel)
+    fun inject(newsRepository: NewsRepository)
 }

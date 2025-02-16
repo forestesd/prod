@@ -22,3 +22,26 @@ data class Image(
     val url: String,
     val width: Float
 )
+
+data class SearchTimesResponse(
+    val status: String,
+    val response:ResponseDetails
+)
+
+data class ResponseDetails(
+    val docs: List<Docs>
+)
+
+data class Docs(
+    val headline: HeadLine?,
+    val abstract: String,
+    val source: String?,
+    val pub_date: String,
+    val web_url: String,
+    val multimedia: List<Image>,
+    val subsection_name: String?
+)
+
+data class HeadLine(
+    val main: String?
+)

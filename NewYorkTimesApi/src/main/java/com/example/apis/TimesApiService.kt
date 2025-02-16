@@ -11,4 +11,10 @@ interface TimesApiService {
         @Path("section") section: String,
         @Query("api-key") apiKey: String
     ): TimesResponse
+
+    @GET("articlesearch.json")
+    suspend fun searchNews(
+        @Query ("q") q: String,
+        @Query ("api-key") apiKey: String
+    ): SearchTimesResponse
 }

@@ -13,14 +13,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.apis.NewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebViewNews(url: String, onBack: () -> Unit) {
-
+fun WebViewNews(url: String, newsViewModel: NewsViewModel, onBack: () -> Unit) {
+    LaunchedEffect(Unit) {
+        newsViewModel.setIsSearching(false)
+    }
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

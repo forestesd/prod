@@ -2,10 +2,9 @@ package com.example.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.apis.NewsViewModel
 import com.example.home.newsFeed.NewsFeedMain
 import com.example.home.newsFeed.ProgressBar
+import com.example.home.search.SearchScreen
 import com.example.home.tickers.TickersFeedMain
 import com.example.home.tickers.TickersProgressBar
 import com.example.tickersapi.TickersViewModel
@@ -33,29 +33,32 @@ fun MainScreen(
         tickersViewModel.loadTickers()
     }
 
-    val news by newsViewModel.news
+    val news by  newsViewModel.news
+    val serchNews by newsViewModel.searchNews
     val tickers by tickersViewModel.tickers
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Spacer(modifier = Modifier.fillMaxWidth().height(100.dp))
+        horizontalAlignment = Alignment.Start
+    ) {
 
-        if (tickersViewModel.isLoading.value){
+        SearchScreen(newsViewModel)
+
+        HorizontalDivider(modifier = Modifier.padding(10.dp))
+
+        if (tickersViewModel.isLoading.value) {
             TickersProgressBar()
-        }else {
+        } else {
             TickersFeedMain(tickers)
         }
 
-        if (newsViewModel.isLoading.value){
+        if (newsViewModel.isLoading.value) {
             ProgressBar()
-        }else{
-            NewsFeedMain(news, newsViewModel, onCardClicked)
+        } else {
+            NewsFeedMain(if (newsViewModel.isSearching.value) serchNews else news, newsViewModel, onCardClicked)
         }
 
     }
-
 
 
 }
