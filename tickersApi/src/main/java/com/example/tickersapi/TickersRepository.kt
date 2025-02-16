@@ -1,6 +1,11 @@
 package com.example.tickersapi
 
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 import javax.inject.Inject
 
 class TickersRepository @Inject constructor(
@@ -12,11 +17,23 @@ class TickersRepository @Inject constructor(
 
     suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
         val tickersUi = mutableListOf<TickerUi>()
-        for (symbol in tickers) {
-            val companyProfile = api.getCompanyInfo(symbol, apiKey)
-            val stockQuote = api.getInfoTicker(symbol, apiKey)
-           tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
+
+        coroutineScope {
+            val jobs = tickers.map { symbol ->
+                async(Dispatchers.IO) {
+                    val companyProfile = api.getCompanyInfo(symbol, apiKey)
+                    val stockQuote = api.getInfoTicker(symbol, apiKey)
+                    tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
+                }
+            }
+            jobs.awaitAll()
         }
+
+
+
+
+
+
         return tickersUi
     }
 }

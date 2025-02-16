@@ -58,7 +58,7 @@ fun AppNavigation(tickersViewModel: TickersViewModel,newsViewModel: NewsViewMode
             }
             composable("webViewNews/{url}") {
                 val decodeUrl = it.arguments?.getString("url").toString()
-                WebViewNews(decodeUrl,{navController.navigate("main")})
+                WebViewNews(decodeUrl) { navController.navigate("main") }
             }
             composable("finance") {
                 FinanceScreen()

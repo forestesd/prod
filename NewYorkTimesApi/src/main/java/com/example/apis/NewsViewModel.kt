@@ -4,13 +4,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-@HiltViewModel
 class NewsViewModel @Inject constructor(
     private val repository: NewsRepository
 ) : ViewModel() {
@@ -20,35 +18,33 @@ class NewsViewModel @Inject constructor(
     private var _isLoading = mutableStateOf(true)
     val isLoading: State<Boolean> = _isLoading
 
+
+    private fun validateNews(newsList: List<Article>): List<Article> {
+        return newsList.map { newsItem ->
+            newsItem.copy(
+                published_date = try {
+                    LocalDate.parse(newsItem.published_date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                } catch (e: Exception) {
+                    newsItem.published_date
+                }
+            )
+        }.filter { it.abstract.isNotEmpty() }
+    }
+
+
     fun loadNews() {
         viewModelScope.launch {
             if (_news.value.isEmpty()) {
                 _isLoading.value = true
 
-                _news.value = repository.getCachedNews()
+                val newsList = repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                _news.value = validateNews(newsList)
 
-                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
-                    .let { newsList ->
-
-                        _news.value = newsList.map { newsItem ->
-
-                            newsItem.copy(
-                                published_date = try {
-
-                                    LocalDate.parse(
-                                        newsItem.published_date,
-                                        DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                                    ).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-
-                                } catch (e: Exception) {
-                                    newsItem.published_date
-                                }
-                            )
-                        }.filter { it.abstract != "" }
-                    }
                 _isLoading.value =false
             }else{
-                _news.value = repository.getCachedNews()
+                val newsList = repository.getCachedNews()
+                _news.value = validateNews(newsList)
                 _isLoading.value = false
             }
 
