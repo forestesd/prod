@@ -1,5 +1,7 @@
 package com.example.prod
 
+import android.app.Application
+import android.content.Context
 import com.example.apis.NewsRepository
 import com.example.apis.NewsViewModel
 import com.example.apis.RetrofitTimesInstance
@@ -39,7 +41,6 @@ class TimesApiModule {
 
 @Module
 class TickersApiModel{
-
     @Provides
     @Singleton
     fun provideTickersApiService(): TickersApiService{
@@ -48,18 +49,27 @@ class TickersApiModel{
 
     @Provides
     @Singleton
-    fun provideTickersRepository(api: TickersApiService):TickersRepository{
-        return TickersRepository(api)
+    fun provideTickersRepository(api: TickersApiService, context: Context):TickersRepository{
+        return TickersRepository(context, api)
     }
 
     @Provides
     @Singleton
-    fun provideTickersViewModel(repositiry: TickersRepository): TickersViewModel{
-        return TickersViewModel(repositiry)
+    fun provideTickersViewModel(repository: TickersRepository): TickersViewModel{
+        return TickersViewModel(repository)
     }
 }
+@Module
+class AppModule(private val application: Application) {
+    @Provides
+    @Singleton
+    fun provideApplication(): Application = application
 
-@Component(modules = [TimesApiModule::class, TickersApiModel::class])
+    @Provides
+    @Singleton
+    fun provideContext(): Context = application.applicationContext
+}
+@Component(modules = [TimesApiModule::class, TickersApiModel::class, AppModule::class])
 @Singleton
 interface AppComponent {
     fun inject(activity: MainActivity)

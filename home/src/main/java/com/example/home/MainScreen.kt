@@ -16,6 +16,7 @@ import com.example.apis.NewsViewModel
 import com.example.home.newsFeed.NewsFeedMain
 import com.example.home.newsFeed.ProgressBar
 import com.example.home.tickers.TickersFeedMain
+import com.example.home.tickers.TickersProgressBar
 import com.example.tickersapi.TickersViewModel
 
 @Composable
@@ -41,7 +42,11 @@ fun MainScreen(
     ){
         Spacer(modifier = Modifier.fillMaxWidth().height(100.dp))
 
+        if (tickersViewModel.isLoading.value){
+            TickersProgressBar()
+        }else {
             TickersFeedMain(tickers)
+        }
 
         if (newsViewModel.isLoading.value){
             ProgressBar()
