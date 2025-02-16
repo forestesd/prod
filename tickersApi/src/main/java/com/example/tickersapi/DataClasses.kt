@@ -1,5 +1,8 @@
 package com.example.tickersapi
 
+import androidx.compose.ui.graphics.Color
+
+
 data class StockQuote(
     val c: Float, // Текущая цена
     val h: Float, // Максимальная цена за день
@@ -20,5 +23,5 @@ data class TickerUi(
     val price: Float,
     val priceChangePercent: Float,
     val isUp: Boolean,
-    val priceColor: Int,
+    val priceColor: Color,
 )

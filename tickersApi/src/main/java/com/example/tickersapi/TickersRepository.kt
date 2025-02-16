@@ -7,7 +7,7 @@ class TickersRepository @Inject constructor(
     private val api: TickersApiService
 ) {
     private val tickers =
-        listOf("AAPL", "MSFT ", "GOOGL", "AMZN", "TSLA", "META", "NVDA", "NFLX", "AMD", "INTC")
+        listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NVDA", "NFLX", "AMD", "INTC")
 
 
     suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
@@ -15,7 +15,7 @@ class TickersRepository @Inject constructor(
         for (symbol in tickers) {
             val companyProfile = api.getCompanyInfo(symbol, apiKey)
             val stockQuote = api.getInfoTicker(symbol, apiKey)
-           tickersUi.add(TickersUiMapper(companyProfile, stockQuote))
+           tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
         }
         return tickersUi
     }

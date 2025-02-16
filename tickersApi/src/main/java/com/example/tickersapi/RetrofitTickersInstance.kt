@@ -8,14 +8,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitTickersInstance {
     private const val BASE_URL = "https://finnhub.io/api/v1/"
 
-    val logginigInspector = HttpLoggingInterceptor().apply {
+    private val logginigInspector = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    val client = OkHttpClient.Builder()
+    private val client = OkHttpClient.Builder()
         .addInterceptor(logginigInspector)
         .build()
 
-    val api: TickersApiService by lazy{
+    val api: TickersApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)

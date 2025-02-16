@@ -2,16 +2,20 @@ package com.example.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.apis.NewsViewModel
-import com.example.home.NewsFeed.NewsFeedMain
-import com.example.home.NewsFeed.ProgressBar
-import com.example.home.Tickers.TickersFeedMain
+import com.example.home.newsFeed.NewsFeedMain
+import com.example.home.newsFeed.ProgressBar
+import com.example.home.tickers.TickersFeedMain
 import com.example.tickersapi.TickersViewModel
 
 @Composable
@@ -35,12 +39,10 @@ fun MainScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        Spacer(modifier = Modifier.fillMaxWidth().height(100.dp))
 
-        if (tickersViewModel.isLoading.value){
-            ProgressBar()
-        }else{
-            TickersFeedMain(tickers, tickersViewModel)
-        }
+            TickersFeedMain(tickers)
+
         if (newsViewModel.isLoading.value){
             ProgressBar()
         }else{

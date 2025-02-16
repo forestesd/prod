@@ -1,4 +1,4 @@
-package com.example.home.NewsFeed
+package com.example.home.newsFeed
 
 import android.webkit.WebView
 import android.webkit.WebViewClient

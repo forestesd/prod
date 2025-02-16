@@ -1,4 +1,4 @@
-package com.example.home.NewsFeed
+package com.example.home.newsFeed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
