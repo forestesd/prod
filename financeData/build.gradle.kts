@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tickersapi"
+    namespace = "com.example.financedate"
     compileSdk = 34
 
     defaultConfig {
@@ -32,22 +32,16 @@ android {
         jvmTarget = "1.8"
     }
 }
-
 kapt{
     correctErrorTypes = true
 }
-
 dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    implementation ("com.google.dagger:dagger:2.42")
-    kapt ("com.google.dagger:dagger-compiler:2.42")
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)

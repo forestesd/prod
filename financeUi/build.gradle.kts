@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id ("kotlin-kapt")
 }
 
 android {
-    namespace = "com.example.tickersapi"
+    namespace = "com.example.financeui"
     compileSdk = 34
 
     defaultConfig {
@@ -33,21 +32,9 @@ android {
     }
 }
 
-kapt{
-    correctErrorTypes = true
-}
-
 dependencies {
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    implementation ("com.google.dagger:dagger:2.42")
-    kapt ("com.google.dagger:dagger-compiler:2.42")
-
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
