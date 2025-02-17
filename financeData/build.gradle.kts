@@ -38,10 +38,15 @@ kapt{
 dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation ("com.google.dagger:dagger:2.48")
+    kapt ("com.google.dagger:dagger-compiler:2.48")
+
     implementation ("androidx.room:room-runtime:2.6.1")
     kapt ("androidx.room:room-compiler:2.6.1")
+    implementation ("androidx.room:room-ktx:2.5.0")
 
-    implementation(libs.androidx.core.ktx)
+    implementation("androidx.core:core-ktx:1.12.0")
+
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)

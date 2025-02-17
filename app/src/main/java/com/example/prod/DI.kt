@@ -7,6 +7,10 @@ import com.example.apis.NewsViewModel
 import com.example.apis.RetrofitSearchTimesInstance
 import com.example.apis.RetrofitTimesInstance
 import com.example.apis.TimesApiService
+import com.example.financedate.FinaceViewModel
+import com.example.financedate.db.FinanceDB
+import com.example.financedate.db.GoalDAO
+import com.example.financedate.db.TransactionDao
 import com.example.tickersapi.RetrofitTickersInstance
 import com.example.tickersapi.TickersApiService
 import com.example.tickersapi.TickersRepository
@@ -84,11 +88,33 @@ class AppModule(private val application: Application) {
     fun provideContext(): Context = application.applicationContext
 }
 
-@Component(modules = [TimesApiModule::class, TickersApiModel::class, AppModule::class])
+@Module
+class DataBaseFinanceModule{
+
+    @Provides
+    @Singleton
+    fun provideGoalDAO(financeDb: FinanceDB): GoalDAO{
+        return financeDb.goalDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTransactionDao(financeDb: FinanceDB): TransactionDao{
+        return financeDb.transactionDao()
+    }
+    @Provides
+    @Singleton
+    fun provideFinanceDb(context: Context): FinanceDB{
+        return FinanceDB.getDB(context)
+    }
+}
+
+@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class, AppModule::class])
 @Singleton
 interface AppComponent {
     fun inject(activity: MainActivity)
 
     fun inject(newsViewModel: NewsViewModel)
     fun inject(newsRepository: NewsRepository)
+    fun inject(finaceViewModel: FinaceViewModel)
 }

@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":home"))
     implementation(project(":NewYorkTimesApi"))
     implementation(project(":tickersApi"))
+    implementation(project(":financeData"))
+    implementation(project(":financeUi"))
 
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.core:core-ktx:1.12.0")

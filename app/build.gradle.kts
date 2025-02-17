@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":NewYorkTimesApi"))
     implementation(project(":tickersApi"))
+    implementation(project(":financeData"))
 
     implementation ("com.google.dagger:dagger:2.48")
     kapt ("com.google.dagger:dagger-compiler:2.48")
@@ -56,6 +57,9 @@ dependencies {
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.lifecycle.runtime.ktx)
