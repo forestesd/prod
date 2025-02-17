@@ -15,4 +15,10 @@ interface TickersApiService {
         @Query("symbol") symbol: String,
         @Query("token") token: String
     ): CompanyProfileResponse
+    @GET("search")
+    suspend fun searchCompany(
+        @Query("q") q: String,
+        @Query("exchange") exchange: String,
+        @Query("token") token: String
+    ):SearchCompany
 }

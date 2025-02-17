@@ -76,8 +76,9 @@ class NewsViewModel @Inject constructor(
     }
 
     fun loadSearchNews(q: String) {
-        if (q.length >= 3) {
+        if (q.length >= 2) {
             viewModelScope.launch {
+                _isLoading.value = true
                 val newsList = repository.getSearchNews(q, "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg").sortedByDescending {
                     try {
                         val formattedDate = it.pub_date.replaceFirst(
@@ -89,6 +90,7 @@ class NewsViewModel @Inject constructor(
                     }
                 }
                 _searchNews.value = validateSearchNews(newsList)
+                _isLoading.value = false
             }
         }
     }

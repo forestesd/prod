@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.io.InputStreamReader
 
@@ -17,14 +18,14 @@ class TickersRepository @Inject constructor(
 ) {
     private val tickers = loadTickersFromJSON()
 
-    private fun loadTickersFromJSON(): List<String>{
+    private fun loadTickersFromJSON(): List<String> {
         val jsonFile = context.resources.openRawResource(R.raw.tickers)
         val reader = InputStreamReader(jsonFile)
         val jsonStr = reader.readText()
 
         val jsonArray = JSONArray(jsonStr)
         val tickersList = mutableListOf<String>()
-        for (i in 0 ..< jsonArray.length()){
+        for (i in 0..<jsonArray.length()) {
             tickersList.add(jsonArray.getString(i))
         }
         return tickersList
@@ -36,8 +37,8 @@ class TickersRepository @Inject constructor(
         coroutineScope {
             val jobs = tickers.map { symbol ->
                 async(Dispatchers.IO) {
-                    val companyProfile = api.getCompanyInfo(symbol, apiKey)
-                    val stockQuote = api.getInfoTicker(symbol, apiKey)
+                    val companyProfile = getCompanyProfile(symbol,apiKey)
+                    val stockQuote = getCompanyTicker(symbol, apiKey)
                     tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
                 }
             }
@@ -45,5 +46,38 @@ class TickersRepository @Inject constructor(
         }
 
         return tickersUi
+    }
+
+    suspend fun searchCompany(apiKey: String, q: String, exchange: String): List<TickerUi> {
+        val tickerUi = mutableListOf<TickerUi>()
+        coroutineScope {
+            val companiesSearch = api.searchCompany(q, exchange, apiKey)
+            val jobs = companiesSearch.result.map { item ->
+                async(Dispatchers.IO) {
+                    val companyProfile = getCompanyProfile(item.symbol,apiKey)
+                    val companyTicker = getCompanyTicker(item.symbol, apiKey)
+                    tickerUi.add(tickersUiMapper(companyProfile,companyTicker))
+                }
+            }
+            jobs.awaitAll()
+        }
+        return tickerUi
+
+    }
+
+    private suspend fun getCompanyProfile(symbol: String, apiKey: String): CompanyProfileResponse{
+        var companyProfile: CompanyProfileResponse
+        withContext(Dispatchers.IO) {
+            companyProfile = api.getCompanyInfo(symbol, apiKey)
+        }
+        return companyProfile
+    }
+
+    private suspend fun getCompanyTicker(symbol: String,apiKey: String): StockQuote{
+        var ticker: StockQuote
+        withContext(Dispatchers.IO){
+            ticker = api.getInfoTicker(symbol, apiKey)
+        }
+        return ticker
     }
 }

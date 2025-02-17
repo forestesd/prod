@@ -39,11 +39,14 @@ import kotlinx.coroutines.delay
 fun SearchScreen(newsViewModel: NewsViewModel) {
     var query by remember { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
-    Text(
-        text = "Главная",
-        modifier = Modifier.padding(start = 10.dp, top = 16.dp),
-        fontSize = 34.sp
-    )
+    if (!newsViewModel.isSearching.value){
+        Text(
+            text = "Главная",
+            modifier = Modifier.padding(start = 10.dp, top = 16.dp),
+            fontSize = 34.sp
+        )
+    }
+
     Box(Modifier
         .fillMaxWidth()
         .wrapContentHeight()

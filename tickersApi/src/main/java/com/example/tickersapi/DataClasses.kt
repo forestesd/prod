@@ -25,3 +25,11 @@ data class TickerUi(
     val isUp: Boolean,
     val priceColor: Color,
 )
+
+data class SearchCompany(
+    val result: List<SearchCompanyProfile>
+)
+
+data class SearchCompanyProfile(
+    val symbol: String
+)

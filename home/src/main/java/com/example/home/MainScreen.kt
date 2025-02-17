@@ -33,7 +33,7 @@ fun MainScreen(
         tickersViewModel.loadTickers()
     }
 
-    val news by  newsViewModel.news
+    val news by newsViewModel.news
     val serchNews by newsViewModel.searchNews
     val tickers by tickersViewModel.tickers
     Column(
@@ -46,6 +46,8 @@ fun MainScreen(
 
         HorizontalDivider(modifier = Modifier.padding(10.dp))
 
+
+
         if (tickersViewModel.isLoading.value) {
             TickersProgressBar()
         } else {
@@ -55,7 +57,11 @@ fun MainScreen(
         if (newsViewModel.isLoading.value) {
             ProgressBar()
         } else {
-            NewsFeedMain(if (newsViewModel.isSearching.value) serchNews else news, newsViewModel, onCardClicked)
+            NewsFeedMain(
+                if (newsViewModel.isSearching.value) serchNews else news,
+                newsViewModel,
+                onCardClicked
+            )
         }
 
     }
