@@ -73,7 +73,7 @@ class TickersRepository @Inject constructor(
             }
             jobs.awaitAll()
         }
-        return tickerUi.filter { it.name != "null" }.distinctBy { it.symbol }
+        return tickerUi.filter { it.name != "null" && it.price.toDouble() != 0.0}.distinctBy { it.symbol }
 
     }
 

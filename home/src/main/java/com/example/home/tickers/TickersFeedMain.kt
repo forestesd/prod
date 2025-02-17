@@ -2,6 +2,7 @@ package com.example.home.tickers
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -33,7 +35,7 @@ fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel)
 
     if (tickersViewModel.isSearching.value) {
         SearchTickersFeed(tickers)
-    }else{
+    } else {
         MainTickersFeed(tickers)
     }
 
@@ -80,7 +82,7 @@ fun CardTicker(item: TickerUi, isSearch: Boolean) {
         modifier = Modifier
             .wrapContentWidth()
             .height(80.dp)
-            .padding(end = 10.dp, bottom =  if(isSearch) 5.dp else 0.dp ),
+            .padding(end = 10.dp, bottom = if (isSearch) 5.dp else 0.dp),
 
         ) {
         Row(
@@ -95,6 +97,7 @@ fun CardTicker(item: TickerUi, isSearch: Boolean) {
                     .size(45.dp)
                     .clip(CircleShape),
                 placeholder = painterResource(R.drawable.placeholder),
+                error = painterResource(R.drawable.placeholder),
                 contentScale = ContentScale.Crop,
                 contentDescription = "Логотип тикера"
             )
@@ -102,21 +105,29 @@ fun CardTicker(item: TickerUi, isSearch: Boolean) {
                 text = item.name,
                 modifier = Modifier.padding(end = 12.dp, start = 5.dp)
             )
+            if (isSearch) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             Text(
-                text = "${item.price}$ (${item.priceChangePercent})%",
-                color = item.priceColor
-            )
-            if (item.isUp) {
-                Icon(
-                    painterResource(R.drawable.ticker_up_icon),
-                    contentDescription = "Акции на подъёме",
+                text = if (!isSearch)
+                    "${item.price}$ (${item.priceChangePercent})%" else "${item.price}$",
 
+                color = if (!isSearch) item.priceColor else Color.Black,
+                modifier = Modifier.padding(end = 10.dp)
+            )
+            if (!isSearch) {
+                if (item.isUp) {
+                    Icon(
+                        painterResource(R.drawable.ticker_up_icon),
+                        contentDescription = "Акции на подъёме",
+
+                        )
+                } else {
+                    Icon(
+                        painterResource(R.drawable.ticker_down_icon),
+                        contentDescription = "Акции опускаются в цене",
                     )
-            } else {
-                Icon(
-                    painterResource(R.drawable.ticker_down_icon),
-                    contentDescription = "Акции опускаются в цене",
-                )
+                }
             }
         }
     }

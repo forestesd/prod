@@ -4,11 +4,11 @@ import androidx.compose.ui.graphics.Color
 
 
 data class StockQuote(
-    val c: Float, // Текущая цена
-    val h: Float, // Максимальная цена за день
-    val l: Float, // Минимальная цена за день
-    val o: Float, // Цена открытия
-    val pc: Float // Цена закрытия предыдущего дня
+    val c: Double, // Текущая цена
+    val h: Double, // Максимальная цена за день
+    val l: Double, // Минимальная цена за день
+    val o: Double, // Цена открытия
+    val pc: Double // Цена закрытия предыдущего дня
 )
 data class CompanyProfileResponse(
     val name: String?,
@@ -21,8 +21,8 @@ data class TickerUi(
     val name: String,
     val symbol: String,
     val logoUrl: String,
-    val price: Float,
-    val priceChangePercent: Float,
+    val price: String,
+    val priceChangePercent: String,
     val isUp: Boolean,
     val priceColor: Color,
 )

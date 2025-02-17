@@ -126,6 +126,7 @@ fun <T> NewsMain(newsItem: T, imageUrl: String?) {
             .background(Color.Gray),
         contentScale = ContentScale.Crop,
         placeholder = painterResource(R.drawable.placeholder),
+        error = painterResource(R.drawable.placeholder),
         contentDescription = "News Image"
     )
 
