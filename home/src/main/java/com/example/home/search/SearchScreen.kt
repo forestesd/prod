@@ -31,12 +31,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apis.NewsViewModel
+import com.example.tickersapi.TickersViewModel
 import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(newsViewModel: NewsViewModel) {
+fun SearchScreen(newsViewModel: NewsViewModel, tickersViewModel: TickersViewModel) {
     var query by remember { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     if (!newsViewModel.isSearching.value){
@@ -79,6 +80,7 @@ fun SearchScreen(newsViewModel: NewsViewModel) {
                         onExpandedChange = {
                             expanded = it
                             newsViewModel.setIsSearching(expanded)
+                            tickersViewModel.setLoadingStatus(expanded)
                         },
                         placeholder = { Text("Поиск") },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
@@ -95,6 +97,7 @@ fun SearchScreen(newsViewModel: NewsViewModel) {
                 delay(500)
                 if (query.isNotEmpty()) {
                     newsViewModel.loadSearchNews(query)
+                    tickersViewModel.searchTickers(query)
                 }
 
             }
@@ -104,6 +107,8 @@ fun SearchScreen(newsViewModel: NewsViewModel) {
                         query = ""
                         expanded = false
                         newsViewModel.setIsSearching(expanded)
+                        tickersViewModel.setLoadingStatus(expanded)
+                        tickersViewModel.loadTickers()
                     },
                     modifier = Modifier.padding(start = 8.dp)
                 ) {

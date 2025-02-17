@@ -6,8 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import retrofit2.HttpException
 import java.io.InputStreamReader
 
 import javax.inject.Inject
@@ -37,8 +37,8 @@ class TickersRepository @Inject constructor(
         coroutineScope {
             val jobs = tickers.map { symbol ->
                 async(Dispatchers.IO) {
-                    val companyProfile = getCompanyProfile(symbol,apiKey)
-                    val stockQuote = getCompanyTicker(symbol, apiKey)
+                    val companyProfile = api.getCompanyInfo(symbol,apiKey)
+                    val stockQuote = api.getInfoTicker(symbol, apiKey)
                     tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
                 }
             }
@@ -52,32 +52,29 @@ class TickersRepository @Inject constructor(
         val tickerUi = mutableListOf<TickerUi>()
         coroutineScope {
             val companiesSearch = api.searchCompany(q, exchange, apiKey)
-            val jobs = companiesSearch.result.map { item ->
+            val jobs = companiesSearch.result.distinctBy {it.symbol}.take(10).map { item ->
                 async(Dispatchers.IO) {
-                    val companyProfile = getCompanyProfile(item.symbol,apiKey)
-                    val companyTicker = getCompanyTicker(item.symbol, apiKey)
-                    tickerUi.add(tickersUiMapper(companyProfile,companyTicker))
+                    try {
+                        val companyProfile = api.getCompanyInfo(item.symbol,apiKey)
+                        val companyTicker = api.getInfoTicker(item.symbol, apiKey)
+                        val mappedTicker = tickersUiMapper(companyProfile,companyTicker)
+                        synchronized(tickerUi) {
+                            if (!tickerUi.contains(mappedTicker)) {
+                                tickerUi.add(mappedTicker)
+                            }
+                        }
+                    }catch (_:HttpException){
+
+                    }
+
+
+
                 }
             }
             jobs.awaitAll()
         }
-        return tickerUi
+        return tickerUi.filter { it.name != "null" }.distinctBy { it.symbol }
 
     }
 
-    private suspend fun getCompanyProfile(symbol: String, apiKey: String): CompanyProfileResponse{
-        var companyProfile: CompanyProfileResponse
-        withContext(Dispatchers.IO) {
-            companyProfile = api.getCompanyInfo(symbol, apiKey)
-        }
-        return companyProfile
-    }
-
-    private suspend fun getCompanyTicker(symbol: String,apiKey: String): StockQuote{
-        var ticker: StockQuote
-        withContext(Dispatchers.IO){
-            ticker = api.getInfoTicker(symbol, apiKey)
-        }
-        return ticker
-    }
 }

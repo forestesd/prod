@@ -42,7 +42,7 @@ fun MainScreen(
         horizontalAlignment = Alignment.Start
     ) {
 
-        SearchScreen(newsViewModel)
+        SearchScreen(newsViewModel,tickersViewModel)
 
         HorizontalDivider(modifier = Modifier.padding(10.dp))
 
@@ -51,7 +51,7 @@ fun MainScreen(
         if (tickersViewModel.isLoading.value) {
             TickersProgressBar()
         } else {
-            TickersFeedMain(tickers)
+            TickersFeedMain(tickers,tickersViewModel)
         }
 
         if (newsViewModel.isLoading.value) {

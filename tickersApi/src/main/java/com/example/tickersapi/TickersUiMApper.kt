@@ -14,8 +14,9 @@ fun tickersUiMapper(companyProfileResponse: CompanyProfileResponse, stockQuote: 
 
     return TickerUi(
         name = companyProfileResponse.name.toString(),
+        symbol =  companyProfileResponse.ticker.toString(),
         logoUrl = companyProfileResponse.logo.toString(),
-        price = stockQuote.c,
+        price = round(stockQuote.c*100)/100,
         priceChangePercent = round(priceChangePercent*100)/100,
         isUp =  isUp,
         priceColor = priceColor

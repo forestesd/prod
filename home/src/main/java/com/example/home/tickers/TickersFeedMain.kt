@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -25,9 +26,21 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.home.R
 import com.example.tickersapi.TickerUi
+import com.example.tickersapi.TickersViewModel
 
 @Composable
-fun TickersFeedMain(tickers: List<TickerUi>) {
+fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel) {
+
+    if (tickersViewModel.isSearching.value) {
+        SearchTickersFeed(tickers)
+    }else{
+        MainTickersFeed(tickers)
+    }
+
+}
+
+@Composable
+fun MainTickersFeed(tickers: List<TickerUi>) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,53 +49,75 @@ fun TickersFeedMain(tickers: List<TickerUi>) {
         verticalAlignment = Alignment.CenterVertically,
 
         ) {
-        items(tickers, key = { item -> item.name }) { item ->
-            Card(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .fillMaxHeight()
-                    .padding(end = 10.dp),
-
-                ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    AsyncImage(
-                        model = item.logoUrl,
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(45.dp)
-                            .clip(CircleShape),
-                        placeholder = painterResource(R.drawable.placeholder),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "Логотип тикера"
-                    )
-                    Text(
-                        text = item.name,
-                        modifier = Modifier.padding(end = 12.dp, start = 5.dp)
-                    )
-                    Text(
-                        text = "${item.price}$ (${item.priceChangePercent})%",
-                        color = item.priceColor
-                    )
-                    if (item.isUp) {
-                        Icon(
-                            painterResource(R.drawable.ticker_up_icon),
-                            contentDescription = "Акции на подъёме",
-
-                            )
-                    } else {
-                        Icon(
-                            painterResource(R.drawable.ticker_down_icon),
-                            contentDescription = "Акции опускаются в цене",
-                        )
-                    }
-                }
-            }
+        items(tickers, key = { item -> item.symbol }) { item ->
+            CardTicker(item, false)
         }
 
 
+    }
+}
+
+@Composable
+fun SearchTickersFeed(tickers: List<TickerUi>) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.3f)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 10.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(tickers, key = { item -> item.symbol }) { item ->
+            CardTicker(item, true)
+        }
+    }
+}
+
+@Composable
+fun CardTicker(item: TickerUi, isSearch: Boolean) {
+    Card(
+        modifier = Modifier
+            .wrapContentWidth()
+            .height(80.dp)
+            .padding(end = 10.dp, bottom =  if(isSearch) 5.dp else 0.dp ),
+
+        ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            AsyncImage(
+                model = item.logoUrl,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .size(45.dp)
+                    .clip(CircleShape),
+                placeholder = painterResource(R.drawable.placeholder),
+                contentScale = ContentScale.Crop,
+                contentDescription = "Логотип тикера"
+            )
+            Text(
+                text = item.name,
+                modifier = Modifier.padding(end = 12.dp, start = 5.dp)
+            )
+            Text(
+                text = "${item.price}$ (${item.priceChangePercent})%",
+                color = item.priceColor
+            )
+            if (item.isUp) {
+                Icon(
+                    painterResource(R.drawable.ticker_up_icon),
+                    contentDescription = "Акции на подъёме",
+
+                    )
+            } else {
+                Icon(
+                    painterResource(R.drawable.ticker_down_icon),
+                    contentDescription = "Акции опускаются в цене",
+                )
+            }
+        }
     }
 }

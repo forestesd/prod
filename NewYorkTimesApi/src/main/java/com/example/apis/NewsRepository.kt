@@ -2,6 +2,7 @@ package com.example.apis
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -36,8 +37,15 @@ class NewsRepository @Inject constructor(
         q: String,
         apiKey: String
     ): List<Docs> {
-        val response = searchApiService.searchNews(q, apiKey)
-        return response.response.docs
+        var responseList: List<Docs> = emptyList()
+        try {
+            val res = searchApiService.searchNews(q, apiKey)
+           responseList = res.response.docs
+        }catch (_:HttpException){
+
+        }
+        return responseList
+
     }
 
     fun getCachedNews(): List<Article>{

@@ -19,6 +19,7 @@ data class CompanyProfileResponse(
 
 data class TickerUi(
     val name: String,
+    val symbol: String,
     val logoUrl: String,
     val price: Float,
     val priceChangePercent: Float,

@@ -18,12 +18,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.apis.NewsViewModel
+import com.example.tickersapi.TickersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebViewNews(url: String, newsViewModel: NewsViewModel, onBack: () -> Unit) {
+fun WebViewNews(
+    url: String,
+    newsViewModel: NewsViewModel,
+    tickersViewModel: TickersViewModel,
+    onBack: () -> Unit
+) {
     LaunchedEffect(Unit) {
         newsViewModel.setIsSearching(false)
+        tickersViewModel.setLoadingStatus(false)
     }
     Column(
         modifier = Modifier.fillMaxSize()
