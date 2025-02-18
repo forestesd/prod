@@ -48,6 +48,7 @@ fun MainScreen(
 
 
 
+
         if (tickersViewModel.isLoading.value) {
             TickersProgressBar()
         } else {

@@ -64,7 +64,7 @@ fun SearchTickersFeed(tickers: List<TickerUi>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.3f)
+            .fillMaxHeight(0.35f)
             .padding(horizontal = 16.dp)
             .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Top,

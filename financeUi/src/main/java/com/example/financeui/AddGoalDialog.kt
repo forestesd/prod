@@ -52,6 +52,7 @@ fun AddGoalOrTransactionDialog(
 
         var correctSum by remember { mutableStateOf(true) }
         var isGoalNameValid by remember { mutableStateOf(true) }
+        var typeTransactionValid by remember { mutableStateOf(true) }
         var isSumValid by remember { mutableStateOf(true) }
         Dialog(
             onDismissRequest = { onBack() },
@@ -102,7 +103,13 @@ fun AddGoalOrTransactionDialog(
                             label = { Text(text = "Название цели") }
                         )
                     }
-
+                    if (!typeTransactionValid){
+                        Text(
+                            text = "Выберите тип операции",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                     if (dialogType == "transaction") {
                         GoalDropDown(
                             typeOfTransaction,
@@ -110,6 +117,7 @@ fun AddGoalOrTransactionDialog(
                             listOf("Пополнение", "Снятие")
                         ) {
                             typeOfTransaction = it
+                            typeTransactionValid = it.isNotBlank()
                         }
                     }
                     if (!isSumValid) {
@@ -158,8 +166,9 @@ fun AddGoalOrTransactionDialog(
 
                             isGoalNameValid = goalName.isNotBlank()
                             isSumValid = sum.isNotBlank() && true && enteredSum > 0
+                            typeTransactionValid = typeOfTransaction.isNotBlank()
 
-                            if (isGoalNameValid && isSumValid) {
+                            if (isGoalNameValid && isSumValid && typeTransactionValid) {
                                 if (dialogType == "goal") {
                                     onAddGoal(
                                         goalName,

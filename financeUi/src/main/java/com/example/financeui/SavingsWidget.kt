@@ -48,7 +48,8 @@ fun SavingsWidget(financeViewModel: FinanceViewModel) {
             Text(
                 text = "Всего: ${amount.totalAmount} ₽",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 16.dp)
             )
             RowsWithText("Достижение целей", "${amount.goalComplete}%")
             RowsWithText("Поступление",amount.depositMonths)

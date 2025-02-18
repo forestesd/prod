@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,13 @@ import com.example.financedate.FinanceViewModel
 @Composable
 fun TransactionFrame(financeViewModel: FinanceViewModel, onClickAddButton: () -> Unit) {
     val transactions by financeViewModel.allTransaction
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(transactions.size) {
+        listState.animateScrollToItem(0)
+    }
+
     AddButtons(
         "Добавить операцию",
         enabled = financeViewModel.goalsWithProgress.value.isNotEmpty(),
@@ -35,10 +44,12 @@ fun TransactionFrame(financeViewModel: FinanceViewModel, onClickAddButton: () ->
         )
     }
 
+
     LazyColumn(
         Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        state = listState
     ) {
 
         items(transactions, key = { item -> item.id }) { item ->
