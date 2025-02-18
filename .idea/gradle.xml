@@ -17,6 +17,8 @@
             <option value="$PROJECT_DIR$/home" />
             <option value="$PROJECT_DIR$/navBarUI" />
             <option value="$PROJECT_DIR$/navigation" />
+            <option value="$PROJECT_DIR$/notesData" />
+            <option value="$PROJECT_DIR$/notesUi" />
             <option value="$PROJECT_DIR$/tickersApi" />
           </set>
         </option>
