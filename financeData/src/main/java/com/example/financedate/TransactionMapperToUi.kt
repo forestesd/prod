@@ -6,7 +6,11 @@ fun transactionMapperToUi(goalName: String, transaction: TransactionEntity): Tra
     return TransactionUi(
         id = transaction.id,
         transactionType = transaction.type,
-        ammount = if (transaction.type == "Пополнение") "+ ${transaction.amount}₽" else "- ${transaction.amount}₽",
+        amount = if (transaction.type == "Пополнение") "+ ${formatedBigDecimalWithSpaces(transaction.amount)} ₽" else "- ${
+            formatedBigDecimalWithSpaces(
+                transaction.amount
+            )
+        } ₽",
         goalName = goalName,
         comments = transaction.comment
     )

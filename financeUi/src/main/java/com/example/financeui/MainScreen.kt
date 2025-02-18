@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -18,19 +21,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financedate.FinaceViewModel
+import com.example.financedate.FinanceViewModel
 
 @Composable
-fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
+fun FinanceMainScreen(financeViewModel: FinanceViewModel) {
     var showGoalsDialog by remember { mutableStateOf(false) }
     var showTransactionDialog by remember { mutableStateOf(false) }
-    var correctSumm by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         financeViewModel.getGoalProgress()
         financeViewModel.getTransactions()
-        financeViewModel.allAmmount()
+        financeViewModel.allAmount()
     }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -45,11 +51,11 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
                 .padding(start = 10.dp, top = 16.dp)
         )
         HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-        SavingsWiget(financeViewModel)
+        SavingsWidget(financeViewModel)
         GoalsFrame(financeViewModel)
 
 
-        AddButtons(text = "Добавить цель", enabled = true, onClick = { showGoalsDialog = true})
+        AddButtons(text = "Добавить цель", enabled = true, onClick = { showGoalsDialog = true })
 
         AddGoalOrTransactionDialog(
             financeViewModel.goalsWithProgress.value,
@@ -63,7 +69,14 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
             addTransaction = { _, _, _, _ -> }
         )
 
-        HorizontalDivider(Modifier.padding(top = 10.dp))
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 10.dp)
+                .height(10.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            thickness = 10.dp,
+            color = Color.LightGray
+        )
 
 
         AddGoalOrTransactionDialog(
@@ -72,37 +85,50 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
             showTransactionDialog,
             onBack = { showTransactionDialog = false },
             onAddGoal = { _, _, _ -> },
-            addTransaction = {goalName, summ, typeOftransaction, comment ->
-                financeViewModel.addTransaction(goalName, summ, typeOftransaction, comment)
+            addTransaction = { goalName, sum, typeTransaction, comment ->
+                financeViewModel.addTransaction(goalName, sum, typeTransaction, comment)
                 showTransactionDialog = false
             }
         )
 
-        TransactionFrame(financeViewModel, onClickAddButton =  { showTransactionDialog = true})
+        TransactionFrame(financeViewModel, onClickAddButton = { showTransactionDialog = true })
 
     }
 }
 
 @Composable
-fun AddButtons(text: String, onClick: () -> Unit,enabled: Boolean){
+fun AddButtons(text: String, onClick: () -> Unit, enabled: Boolean) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.padding(start = 10.dp),
-            text = text
-        )
+
         Spacer(modifier = Modifier.weight(1f))
         TextButton(
             enabled = enabled,
             onClick = {
-               onClick()
+                onClick()
             },
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically),
+            colors = ButtonColors(
+                contentColor = Color.Black,
+                containerColor = Color.White,
+                disabledContentColor = Color.LightGray,
+                disabledContainerColor = Color.White
+            )
         ) {
             Text(
-                text = "+"
+                modifier = Modifier.padding(start = 10.dp, end = 15.dp),
+                text = text,
+                fontWeight = FontWeight.Bold
+            )
+            if (text == "Добавить цель") {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            Text(
+                text = "+",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

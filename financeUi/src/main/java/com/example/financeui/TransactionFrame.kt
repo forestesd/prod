@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financedate.FinaceViewModel
+import com.example.financedate.FinanceViewModel
 
 @Composable
-fun TransactionFrame(financeViewModel: FinaceViewModel, onClickAddButton: () -> Unit) {
+fun TransactionFrame(financeViewModel: FinanceViewModel, onClickAddButton: () -> Unit) {
     val transactions by financeViewModel.allTransaction
     AddButtons(
         "Добавить операцию",
@@ -59,7 +59,7 @@ fun TransactionFrame(financeViewModel: FinaceViewModel, onClickAddButton: () -> 
                     )
                     Spacer(Modifier.weight(1f))
                     Text(
-                        text = item.ammount,
+                        text = item.amount,
                         fontSize = 16.sp
                     )
                 }

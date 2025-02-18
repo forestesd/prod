@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(entities = [GoalEntity::class, TransactionEntity::class], version = 1)
+@TypeConverters(BigDecimalConverter::class)
 abstract class FinanceDB: RoomDatabase(){
 
     abstract fun goalDao(): GoalDAO
@@ -13,16 +15,16 @@ abstract class FinanceDB: RoomDatabase(){
 
     companion object{
         @Volatile
-        private var INSTANСE: FinanceDB? = null
+        private var INSTANCE: FinanceDB? = null
 
         fun getDB(context: Context): FinanceDB {
-            return INSTANСE ?: synchronized(this){
+            return INSTANCE ?: synchronized(this){
                 val instance= Room.databaseBuilder(
                     context.applicationContext,
                     FinanceDB::class.java,
                     "finance_db"
                 ).build()
-                INSTANСE = instance
+                INSTANCE = instance
                 instance
             }
         }

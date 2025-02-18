@@ -7,7 +7,7 @@ import com.example.apis.NewsViewModel
 import com.example.apis.RetrofitSearchTimesInstance
 import com.example.apis.RetrofitTimesInstance
 import com.example.apis.TimesApiService
-import com.example.financedate.FinaceViewModel
+import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
@@ -116,5 +116,5 @@ interface AppComponent {
 
     fun inject(newsViewModel: NewsViewModel)
     fun inject(newsRepository: NewsRepository)
-    fun inject(finaceViewModel: FinaceViewModel)
+    fun inject(financeViewModel: FinanceViewModel)
 }

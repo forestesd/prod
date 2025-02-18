@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import com.example.apis.NewsViewModel
-import com.example.financedate.FinaceViewModel
+import com.example.financedate.FinanceViewModel
 import com.example.navigation.AppNavigation
 import com.example.tickersapi.TickersViewModel
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var tickersViewModel: TickersViewModel
     @Inject
-    lateinit var financeViewModel: FinaceViewModel
+    lateinit var financeViewModel: FinanceViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -32,8 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.financedate.FinaceViewModel
 import com.example.financedate.GoalWithProgress
+import java.math.BigDecimal
 
 @Composable
 fun AddGoalOrTransactionDialog(
@@ -41,19 +40,19 @@ fun AddGoalOrTransactionDialog(
     dialogType: String,
     showDialog: Boolean,
     onBack: () -> Unit,
-    onAddGoal: (String, Double, String?) -> Unit,
-    addTransaction: (String, Double, String, String?) -> Unit
+    onAddGoal: (String, BigDecimal, String?) -> Unit,
+    addTransaction: (String, BigDecimal, String, String?) -> Unit
 ) {
     if (showDialog) {
 
         var goalName by remember { mutableStateOf("") }
-        var summ by remember { mutableStateOf("") }
+        var sum by remember { mutableStateOf("") }
         var dateOrComment by remember { mutableStateOf("") }
         var typeOfTransaction by remember { mutableStateOf("") }
 
-        var correctSumm by remember { mutableStateOf(true) }
+        var correctSum by remember { mutableStateOf(true) }
         var isGoalNameValid by remember { mutableStateOf(true) }
-        var isSummValid by remember { mutableStateOf(true) }
+        var isSumValid by remember { mutableStateOf(true) }
         Dialog(
             onDismissRequest = { onBack() },
         ) {
@@ -113,14 +112,14 @@ fun AddGoalOrTransactionDialog(
                             typeOfTransaction = it
                         }
                     }
-                    if (!isSummValid) {
+                    if (!isSumValid) {
                         Text(
                             "Введите корректную сумму",
                             color = Color.Red,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
-                    if (!correctSumm) {
+                    if (!correctSum) {
                         Text(
                             "Недостаточно средств для снятия",
                             color = Color.Red,
@@ -128,13 +127,15 @@ fun AddGoalOrTransactionDialog(
                         )
                     }
                     OutlinedTextField(
-                        value = summ,
+                        value = sum,
                         onValueChange = {
-                            summ = it
-                            val enteredSum = it.toDoubleOrNull() ?: 0.0
+                            sum = it
+                            val enteredSum = it.toBigDecimalOrNull() ?:BigDecimal.ZERO
                             val goal = goals.find { g -> g.goal.name == goalName }
-                            correctSumm = when {
-                                typeOfTransaction == "Снятие" && goal != null -> enteredSum <= goal.goal.currentCollected
+                            correctSum = when {
+                                typeOfTransaction == "Снятие" && goal != null ->
+                                    enteredSum <= goal.goal.currentCollected
+
                                 else -> true
                             }
 
@@ -153,21 +154,21 @@ fun AddGoalOrTransactionDialog(
                         text = "Сохранить",
                         onBack,
                         onSave = {
-                            val enteredSum = summ.toDoubleOrNull() ?: 0.0
+                            val enteredSum = sum.toDoubleOrNull() ?: 0.0
 
                             isGoalNameValid = goalName.isNotBlank()
-                            isSummValid = summ.isNotBlank() && true && enteredSum > 0
+                            isSumValid = sum.isNotBlank() && true && enteredSum > 0
 
-                            if (isGoalNameValid && isSummValid) {
+                            if (isGoalNameValid && isSumValid) {
                                 if (dialogType == "goal") {
                                     onAddGoal(
                                         goalName,
-                                        summ.toDouble(),
+                                        sum.toBigDecimal(),
                                         dateOrComment.takeIf { it.isNotEmpty() })
-                                } else if (correctSumm) {
+                                } else if (correctSum) {
                                     addTransaction(
                                         goalName,
-                                        summ.toDouble(),
+                                        sum.toBigDecimal(),
                                         typeOfTransaction,
                                         dateOrComment.takeIf { it.isNotEmpty() }
                                     )
