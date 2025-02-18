@@ -20,13 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financedate.FinaceViewModel
 
 @Composable
 fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
     var showGoalsDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(financeViewModel) {
+    var showTransactionDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
         financeViewModel.getGoalProgress()
     }
     Column(
@@ -45,37 +45,59 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
         SavingsWiget(financeViewModel)
         GoalsFrame(financeViewModel)
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.padding(start = 10.dp),
-                text = "Добавить цель"
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            TextButton(
-                onClick = {
-                    showGoalsDialog = true
-                },
-                modifier = Modifier.align(Alignment.CenterVertically)
-            ) {
-                Text(
-                    text = "+"
-                )
-            }
-        }
 
+        addButtons("Добавить цель") { showGoalsDialog = true}
 
-        AddGoalDialog(
+        AddGoalOrTransactionDialog(
+            financeViewModel.goalsWithProgress.value,
+            dialogType = "goal",
             showGoalsDialog,
             onBack = { showGoalsDialog = false },
             onAddGoal = { name, amount, date ->
                 financeViewModel.addGoal(name, amount, date)
                 showGoalsDialog = false
+            },
+            addTransaction = { _, _, _, _ -> }
+        )
+
+        HorizontalDivider(Modifier.padding(top = 10.dp))
+        addButtons("Добавить операцию") { showTransactionDialog = true}
+
+        AddGoalOrTransactionDialog(
+            financeViewModel.goalsWithProgress.value,
+            dialogType = "transaction",
+            showTransactionDialog,
+            onBack = { showTransactionDialog = false },
+            onAddGoal = { _, _, _ -> },
+            addTransaction = {goalName, summ, typeOftransaction, comment ->
+                financeViewModel.addTransaction(goalName, summ, typeOftransaction, comment)
+                showTransactionDialog = false
             }
         )
 
+    }
+}
 
+@Composable
+fun addButtons(text: String, onClick: () -> Unit ){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.padding(start = 10.dp),
+            text = text
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        TextButton(
+            onClick = {
+               onClick()
+            },
+            modifier = Modifier.align(Alignment.CenterVertically)
+        ) {
+            Text(
+                text = "+"
+            )
+        }
     }
 }

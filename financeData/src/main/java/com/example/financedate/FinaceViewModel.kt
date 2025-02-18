@@ -11,6 +11,7 @@ import com.example.financedate.db.TransactionEntity
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
+import androidx.compose.ui.graphics.Color
 
 class FinaceViewModel @Inject constructor(
     application: Application,
@@ -28,6 +29,7 @@ class FinaceViewModel @Inject constructor(
         viewModelScope.launch {
             val goal = GoalEntity(name = name, totalCoastTarget = targetCost, deadLine = deadLine)
             goalDAO.insert(goal)
+            getGoalProgress()
         }
     }
 
@@ -39,10 +41,18 @@ class FinaceViewModel @Inject constructor(
 
     fun getGoalProgress() {
         viewModelScope.launch {
-            getAllGoals()
-            val goalsWithProgress = _allGoals.value.map{ goal ->
-               val progress = ((goal.currentCollected +10000)/ goal.totalCoastTarget).coerceIn(0.0, 1.0)
-                GoalWithProgress(goal, progress.toFloat())
+            val allGoals = goalDAO.getAllGoals()
+            val goalsWithProgress = allGoals.map { goal ->
+                val progress =
+                    (goal.currentCollected  / goal.totalCoastTarget).coerceIn(0.0, 1.0)
+
+                val colorProgress = when {
+                    progress > 0.75 -> Color.Green
+                    progress > 0.4 -> Color.Yellow
+                    else -> Color.Red
+                }
+
+                GoalWithProgress(goal, progress.toFloat(), colorProgress)
             }
             _goalsWithProgress.value = goalsWithProgress
         }
@@ -55,10 +65,12 @@ class FinaceViewModel @Inject constructor(
         }
     }
 
-    fun addTransaction(goalId: Int, ammount: Double, type: String, comment: String?) {
+    fun addTransaction(goalName: String, ammount: Double, type: String, comment: String?) {
         viewModelScope.launch {
+            val goalByName = goalDAO.getGoalByName(goalName)
+
             val transaction = TransactionEntity(
-                idGoal = goalId,
+                idGoal = goalByName.id,
                 amount = ammount,
                 type = type,
                 comment = comment,
@@ -67,14 +79,10 @@ class FinaceViewModel @Inject constructor(
             transactionDao.insert(transaction)
 
 
-            val goal = goalDAO.getGoalById(goalId)
-            if (goal != null) {
-                val newAmmount =
-                    if (type == "deposit") goal.currentCollected + ammount else goal.currentCollected - ammount
-                goalDAO.update(goal.copy(currentCollected = newAmmount))
-            }
+            val newAmmount =
+                if (type == "Пополнение") goalByName.currentCollected + ammount else goalByName.currentCollected - ammount
+            goalDAO.update(goalByName.copy(currentCollected = newAmmount))
+            getGoalProgress()
         }
     }
-
-
 }

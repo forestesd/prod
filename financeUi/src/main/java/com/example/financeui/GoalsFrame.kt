@@ -1,13 +1,17 @@
 package com.example.financeui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -18,8 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financedate.FinaceViewModel
@@ -39,6 +45,7 @@ fun GoalsFrame(financeViewModel: FinaceViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
+                    .padding(bottom = 16.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -57,17 +64,30 @@ fun GoalsFrame(financeViewModel: FinaceViewModel) {
                     )
                 }
 
-                LinearProgressIndicator(
-                    progress = { item.progress},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    color = Color.Green,
-                    trackColor = Color.LightGray
-                )
-            }
-        }
 
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .height(15.dp)
+
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(Color.Transparent),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .fillMaxWidth(item.progress)
+                            .background(item.progressColor),
+                        elevation = null,
+                        enabled = false,
+                        ) {
+
+                    }
+
+                }
+            }
+
+        }
     }
 }

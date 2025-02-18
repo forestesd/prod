@@ -23,7 +23,7 @@ fun SavingsWiget(finaceViewModel: FinaceViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.3f)
+            .fillMaxHeight(0.2f)
             .shadow(
                 8.dp,
                 RoundedCornerShape(

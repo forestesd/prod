@@ -17,6 +17,8 @@ interface GoalDAO{
     @Query("SELECT * from goals WHERE id = :goalId Limit 1")
     suspend fun getGoalById(goalId: Int): GoalEntity?
 
+    @Query("SELECT * from goals WHERE name = :goalName Limit 1")
+    suspend fun getGoalByName(goalName:String): GoalEntity
     @Update
     suspend fun update(goal: GoalEntity)
 
