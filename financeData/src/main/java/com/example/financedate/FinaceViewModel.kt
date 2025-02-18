@@ -12,6 +12,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
 import androidx.compose.ui.graphics.Color
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class FinaceViewModel @Inject constructor(
     application: Application,
@@ -19,11 +22,14 @@ class FinaceViewModel @Inject constructor(
     private val transactionDao: TransactionDao
 ) : AndroidViewModel(application) {
 
-    private val _allGoals = mutableStateOf<List<GoalEntity>>(emptyList())
-    val allGoals: State<List<GoalEntity>> = _allGoals
+    private val _allTransactions = mutableStateOf<List<TransactionUi>>(emptyList())
+    val allTransaction: State<List<TransactionUi>> = _allTransactions
 
     private val _goalsWithProgress = mutableStateOf<List<GoalWithProgress>>(emptyList())
     val goalsWithProgress: State<List<GoalWithProgress>> = _goalsWithProgress
+
+    private val _allAmmount = mutableStateOf<Float>(0f)
+    val allAmmount: State<Float> = _allAmmount
 
     fun addGoal(name: String, targetCost: Double, deadLine: String?) {
         viewModelScope.launch {
@@ -33,18 +39,13 @@ class FinaceViewModel @Inject constructor(
         }
     }
 
-    private fun getAllGoals() {
-        viewModelScope.launch {
-            _allGoals.value = goalDAO.getAllGoals()
-        }
-    }
 
     fun getGoalProgress() {
         viewModelScope.launch {
             val allGoals = goalDAO.getAllGoals()
             val goalsWithProgress = allGoals.map { goal ->
                 val progress =
-                    (goal.currentCollected  / goal.totalCoastTarget).coerceIn(0.0, 1.0)
+                    (goal.currentCollected / goal.totalCoastTarget).coerceIn(0.0, 1.0)
 
                 val colorProgress = when {
                     progress > 0.75 -> Color.Green
@@ -60,8 +61,13 @@ class FinaceViewModel @Inject constructor(
 
     fun deleteGoal(goal: GoalEntity) {
         viewModelScope.launch {
-            transactionDao.deleteTransactionsForGoal(goal.id)
-            goalDAO.delete(goal)
+            if (goal.currentCollected > 0) {
+                addTransaction(goal.name, goal.currentCollected, type = "Снятие", comment = null)
+                goalDAO.delete(goal)
+            } else {
+                goalDAO.delete(goal)
+                getGoalProgress()
+            }
         }
     }
 
@@ -70,11 +76,12 @@ class FinaceViewModel @Inject constructor(
             val goalByName = goalDAO.getGoalByName(goalName)
 
             val transaction = TransactionEntity(
-                idGoal = goalByName.id,
+                goalName = goalByName.name,
                 amount = ammount,
                 type = type,
                 comment = comment,
-                date = "2025-02-17"
+                date = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
             )
             transactionDao.insert(transaction)
 
@@ -83,6 +90,30 @@ class FinaceViewModel @Inject constructor(
                 if (type == "Пополнение") goalByName.currentCollected + ammount else goalByName.currentCollected - ammount
             goalDAO.update(goalByName.copy(currentCollected = newAmmount))
             getGoalProgress()
+            getTransactions()
+            allAmmount()
         }
+    }
+
+    fun getTransactions() {
+        viewModelScope.launch {
+            val transactions = transactionDao.getAllTransactions()
+            val transactionUi = transactions.map { transaction ->
+                transactionMapperToUi(transaction.goalName, transaction)
+            }
+            _allTransactions.value = transactionUi
+        }
+    }
+
+    fun allAmmount() {
+        viewModelScope.launch {
+
+            val goals = goalDAO.getAllGoals()
+            _allAmmount.value = goals.sumOf { it.currentCollected }.toFloat()
+        }
+    }
+
+    fun checkSummCorrect(summ: Float, goalSumm: Float): Boolean {
+        return if (goalSumm - summ < 0) false else true
     }
 }

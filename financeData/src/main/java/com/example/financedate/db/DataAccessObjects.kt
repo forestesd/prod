@@ -15,7 +15,7 @@ interface GoalDAO{
     suspend fun getAllGoals(): List<GoalEntity>
 
     @Query("SELECT * from goals WHERE id = :goalId Limit 1")
-    suspend fun getGoalById(goalId: Int): GoalEntity?
+    suspend fun getGoalById(goalId: Int): GoalEntity
 
     @Query("SELECT * from goals WHERE name = :goalName Limit 1")
     suspend fun getGoalByName(goalName:String): GoalEntity
@@ -31,9 +31,9 @@ interface TransactionDao {
     @Insert
     suspend fun insert(transaction: TransactionEntity): Long
 
-    @Query("SELECT * FROM transactions WHERE idGoal = :goalId ORDER BY date DESC")
-    suspend fun getTransactionsForGoal(goalId: Int): List<TransactionEntity>
+    @Query("SELECT * FROM transactions ORDER BY date DESC")
+    suspend fun getAllTransactions(): List<TransactionEntity>
 
-    @Query("DELETE FROM transactions WHERE idGoal = :goalId")
-    suspend fun deleteTransactionsForGoal(goalId: Int)
+    @Query("DELETE FROM transactions WHERE goalName = :goalName")
+    suspend fun deleteTransactionsForGoal(goalName:String )
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.financedate.FinaceViewModel
 import com.example.financedate.GoalWithProgress
 
 @Composable
@@ -43,11 +45,15 @@ fun AddGoalOrTransactionDialog(
     addTransaction: (String, Double, String, String?) -> Unit
 ) {
     if (showDialog) {
+
         var goalName by remember { mutableStateOf("") }
         var summ by remember { mutableStateOf("") }
         var dateOrComment by remember { mutableStateOf("") }
         var typeOfTransaction by remember { mutableStateOf("") }
 
+        var correctSumm by remember { mutableStateOf(true) }
+        var isGoalNameValid by remember { mutableStateOf(true) }
+        var isSummValid by remember { mutableStateOf(true) }
         Dialog(
             onDismissRequest = { onBack() },
         ) {
@@ -57,7 +63,6 @@ fun AddGoalOrTransactionDialog(
                 shadowElevation = 8.dp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -70,25 +75,70 @@ fun AddGoalOrTransactionDialog(
                     )
 
                     if (dialogType == "transaction") {
-                        GoalDropDown(goalName, "Название цели",goals.map { it.goal.name }) {
+                        if (!isGoalNameValid) {
+                            Text(
+                                "Название цели обязательно",
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        GoalDropDown(goalName, "Название цели", goals.map { it.goal.name }) {
                             goalName = it
+                            isGoalNameValid = it.isNotBlank()
                         }
                     } else {
+                        if (!isGoalNameValid) {
+                            Text(
+                                "Название цели обязательно",
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                         OutlinedTextField(
                             value = goalName,
-                            onValueChange = { goalName = it },
+                            onValueChange = {
+                                goalName = it
+                                isGoalNameValid = it.isNotBlank()
+                            },
                             label = { Text(text = "Название цели") }
                         )
                     }
 
                     if (dialogType == "transaction") {
-                        GoalDropDown(typeOfTransaction, "Тип операции",listOf("Пополнение","Снятие")) {
+                        GoalDropDown(
+                            typeOfTransaction,
+                            "Тип операции",
+                            listOf("Пополнение", "Снятие")
+                        ) {
                             typeOfTransaction = it
                         }
                     }
+                    if (!isSummValid) {
+                        Text(
+                            "Введите корректную сумму",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    if (!correctSumm) {
+                        Text(
+                            "Недостаточно средств для снятия",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                     OutlinedTextField(
                         value = summ,
-                        onValueChange = { summ = it },
+                        onValueChange = {
+                            summ = it
+                            val enteredSum = it.toDoubleOrNull() ?: 0.0
+                            val goal = goals.find { g -> g.goal.name == goalName }
+                            correctSumm = when {
+                                typeOfTransaction == "Снятие" && goal != null -> enteredSum <= goal.goal.currentCollected
+                                else -> true
+                            }
+
+                        },
                         label = { Text("сумма") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                     )
@@ -100,20 +150,28 @@ fun AddGoalOrTransactionDialog(
                         }
                     )
                     PositiveAndNegativeButton(
+                        text = "Сохранить",
                         onBack,
                         onSave = {
-                            if (dialogType == "goal") {
-                                onAddGoal(
-                                    goalName,
-                                    summ.toDouble(),
-                                    dateOrComment.takeIf { it.isNotEmpty() })
-                            } else {
-                                addTransaction(
-                                    goalName,
-                                    summ.toDouble(),
-                                    typeOfTransaction,
-                                    dateOrComment.takeIf { it.isNotEmpty() }
-                                )
+                            val enteredSum = summ.toDoubleOrNull() ?: 0.0
+
+                            isGoalNameValid = goalName.isNotBlank()
+                            isSummValid = summ.isNotBlank() && true && enteredSum > 0
+
+                            if (isGoalNameValid && isSummValid) {
+                                if (dialogType == "goal") {
+                                    onAddGoal(
+                                        goalName,
+                                        summ.toDouble(),
+                                        dateOrComment.takeIf { it.isNotEmpty() })
+                                } else if (correctSumm) {
+                                    addTransaction(
+                                        goalName,
+                                        summ.toDouble(),
+                                        typeOfTransaction,
+                                        dateOrComment.takeIf { it.isNotEmpty() }
+                                    )
+                                }
                             }
                         }
                     )
@@ -126,10 +184,10 @@ fun AddGoalOrTransactionDialog(
 
 @Composable
 fun PositiveAndNegativeButton(
+    text: String,
     onBack: () -> Unit,
     onSave: () -> Unit,
-
-    ) {
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
@@ -143,7 +201,7 @@ fun PositiveAndNegativeButton(
                 onSave()
             }
         ) {
-            Text("Сохранить")
+            Text(text)
         }
     }
 }

@@ -16,7 +16,7 @@ data class GoalEntity(
 @Entity(tableName = "transactions")
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val idGoal: Int,
+    val goalName: String,
     val amount: Double,
     val type: String, // пополнение/снятие
     val date: String,

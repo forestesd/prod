@@ -26,8 +26,11 @@ import com.example.financedate.FinaceViewModel
 fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
     var showGoalsDialog by remember { mutableStateOf(false) }
     var showTransactionDialog by remember { mutableStateOf(false) }
+    var correctSumm by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         financeViewModel.getGoalProgress()
+        financeViewModel.getTransactions()
+        financeViewModel.allAmmount()
     }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -46,7 +49,7 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
         GoalsFrame(financeViewModel)
 
 
-        addButtons("Добавить цель") { showGoalsDialog = true}
+        AddButtons(text = "Добавить цель", enabled = true, onClick = { showGoalsDialog = true})
 
         AddGoalOrTransactionDialog(
             financeViewModel.goalsWithProgress.value,
@@ -61,7 +64,7 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
         )
 
         HorizontalDivider(Modifier.padding(top = 10.dp))
-        addButtons("Добавить операцию") { showTransactionDialog = true}
+
 
         AddGoalOrTransactionDialog(
             financeViewModel.goalsWithProgress.value,
@@ -75,11 +78,13 @@ fun FinanceMainScreen(financeViewModel: FinaceViewModel) {
             }
         )
 
+        TransactionFrame(financeViewModel, onClickAddButton =  { showTransactionDialog = true})
+
     }
 }
 
 @Composable
-fun addButtons(text: String, onClick: () -> Unit ){
+fun AddButtons(text: String, onClick: () -> Unit,enabled: Boolean){
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -90,6 +95,7 @@ fun addButtons(text: String, onClick: () -> Unit ){
         )
         Spacer(modifier = Modifier.weight(1f))
         TextButton(
+            enabled = enabled,
             onClick = {
                onClick()
             },
