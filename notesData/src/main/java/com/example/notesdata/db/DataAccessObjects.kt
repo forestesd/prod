@@ -33,13 +33,13 @@ interface PostImageDao {
 @Dao
 interface TagDao {
     @Insert
-    suspend fun insertTag(tag: Tag)
+    suspend fun insertTag(tagEntitiy: TagEntitiy)
 
     @Query("SELECT * FROM tags")
-    suspend fun getAllTags(): List<Tag>
+    suspend fun getAllTags(): List<TagEntitiy>
 
     @Query("SELECT * FROM tags WHERE id IN (:tagIds)")
-    suspend fun getTagsByIds(tagIds: List<Long>): List<Tag>
+    suspend fun getTagsByIds(tagIds: List<Long>): List<TagEntitiy>
 }
 
 @Dao

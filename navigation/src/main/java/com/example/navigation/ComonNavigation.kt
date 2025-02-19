@@ -16,14 +16,20 @@ import com.example.financedate.FinanceViewModel
 import com.example.financeui.FinanceMainScreen
 import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews
+import com.example.notesdata.NotesViewModel
+import com.example.notesui.NotesMainScreen
 import com.example.tickersapi.TickersViewModel
 import com.example.ui.NavigationUI
 import com.example.ui.Newsfeed
 
 @Composable
-fun AppNavigation(tickersViewModel: TickersViewModel,newsViewModel: NewsViewModel, financeViewModel: FinanceViewModel) {
-
-
+fun AppNavigation(
+    tickersViewModel: TickersViewModel,
+    newsViewModel: NewsViewModel,
+    financeViewModel: FinanceViewModel,
+    notesViewModel: NotesViewModel,
+    onPickImageClick: () -> Unit
+) {
 
 
     val navController = rememberNavController()
@@ -41,7 +47,7 @@ fun AppNavigation(tickersViewModel: TickersViewModel,newsViewModel: NewsViewMode
         },
         onNewsFeedClick = {
             selectedItem = 2
-            navController.navigate("newsFeed")
+            navController.navigate("notes")
         }
     ) { paddingValues ->
 
@@ -59,13 +65,17 @@ fun AppNavigation(tickersViewModel: TickersViewModel,newsViewModel: NewsViewMode
             }
             composable("webViewNews/{url}") {
                 val decodeUrl = it.arguments?.getString("url").toString()
-                WebViewNews(decodeUrl, newsViewModel, tickersViewModel) { navController.navigate("main") }
+                WebViewNews(
+                    decodeUrl,
+                    newsViewModel,
+                    tickersViewModel
+                ) { navController.navigate("main") }
             }
             composable("finance") {
                 FinanceMainScreen(financeViewModel)
             }
-            composable("newsFeed") {
-                Newsfeed()
+            composable("notes") {
+               NotesMainScreen(notesViewModel, onPickImageClick)
             }
         }
     }

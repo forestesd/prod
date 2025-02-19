@@ -46,6 +46,8 @@ dependencies {
     implementation(project(":tickersApi"))
     implementation(project(":financeData"))
     implementation(project(":financeUi"))
+    implementation(project(":notesData"))
+    implementation(project(":notesUi"))
 
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.core:core-ktx:1.12.0")

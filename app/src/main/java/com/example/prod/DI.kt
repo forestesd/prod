@@ -11,6 +11,12 @@ import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
+import com.example.notesdata.NotesViewModel
+import com.example.notesdata.db.PostDao
+import com.example.notesdata.db.PostDatabase
+import com.example.notesdata.db.PostImageDao
+import com.example.notesdata.db.PostTagDao
+import com.example.notesdata.db.TagDao
 import com.example.tickersapi.RetrofitTickersInstance
 import com.example.tickersapi.TickersApiService
 import com.example.tickersapi.TickersRepository
@@ -109,7 +115,37 @@ class DataBaseFinanceModule{
     }
 }
 
-@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class, AppModule::class])
+
+@Module
+class PostDatabaseModile{
+
+    @Provides
+    @Singleton
+    fun providePostDatabase(context: Context): PostDatabase {
+        return PostDatabase.getDB(context)
+    }
+    @Provides
+    @Singleton
+    fun providePostDao(postDatabase: PostDatabase): PostDao {
+        return postDatabase.postDao()
+    }
+    @Provides
+    @Singleton
+    fun providePostImageDao(postDatabase: PostDatabase): PostImageDao {
+        return postDatabase.postImageDao()
+    }
+    @Provides
+    @Singleton
+    fun provideTagDao(postDatabase: PostDatabase): TagDao {
+        return postDatabase.tagDao()
+    }
+    @Provides
+    @Singleton
+    fun providePostTagDao(postDatabase: PostDatabase): PostTagDao {
+        return postDatabase.postTagDao()
+    }
+}
+@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class , PostDatabaseModile::class, AppModule::class])
 @Singleton
 interface AppComponent {
     fun inject(activity: MainActivity)
@@ -117,4 +153,5 @@ interface AppComponent {
     fun inject(newsViewModel: NewsViewModel)
     fun inject(newsRepository: NewsRepository)
     fun inject(financeViewModel: FinanceViewModel)
+    fun inject(notesViewModel: NotesViewModel)
 }

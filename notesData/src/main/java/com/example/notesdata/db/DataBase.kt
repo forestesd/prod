@@ -4,14 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [PostEntity::class, PostImageEntity::class, Tag::class, PostTagEntity::class], version = 1)
+@Database(entities = [PostEntity::class, PostImageEntity::class, TagEntitiy::class, PostTagEntity::class], version = 1)
 abstract class PostDatabase : RoomDatabase() {
 
     abstract fun postDao(): PostDao
     abstract fun postImageDao(): PostImageDao
     abstract fun tagDao(): TagDao
-    abstract fun postTagDao(): PostTagEntity
+    abstract fun postTagDao(): PostTagDao
 
     companion object {
         @Volatile
@@ -23,10 +24,19 @@ abstract class PostDatabase : RoomDatabase() {
                     context.applicationContext,
                     PostDatabase::class.java,
                     "event_db"
-                ).build()
+                )
+                    .addCallback(PostDataBaseCallback())
+                    .build()
                 INSTANCE = instance
                 instance
             }
+        }
+    }
+
+    private class PostDataBaseCallback : RoomDatabase.Callback(){
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+            db.execSQL("INSERT INTO tags (name) VALUES ('Спорт'), ('Музыка'), ('Кино'), ('Образование'), ('Технологии')")
         }
     }
 }

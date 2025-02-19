@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":NewYorkTimesApi"))
     implementation(project(":tickersApi"))
     implementation(project(":financeData"))
+    implementation(project(":notesData"))
 
     implementation ("com.google.dagger:dagger:2.48")
     kapt ("com.google.dagger:dagger-compiler:2.48")

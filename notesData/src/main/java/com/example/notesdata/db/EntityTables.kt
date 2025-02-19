@@ -29,7 +29,7 @@ data class PostImageEntity(
 
 
 @Entity(tableName = "tags")
-data class Tag(
+data class TagEntitiy(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "name") val name: String
 )
@@ -41,7 +41,7 @@ data class Tag(
         parentColumns = ["id"],
         childColumns = ["post_id"],
         onDelete = ForeignKey.CASCADE),
-    ForeignKey(entity = Tag::class,
+    ForeignKey(entity = TagEntitiy::class,
         parentColumns = ["id"],
         childColumns = ["tag_id"],
         onDelete = ForeignKey.CASCADE)
