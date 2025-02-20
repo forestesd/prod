@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [PostEntity::class, PostImageEntity::class, TagEntitiy::class, PostTagEntity::class], version = 1)
+@Database(entities = [PostEntity::class, PostImageEntity::class, TagEntity::class, PostTagEntity::class], version = 1)
 abstract class PostDatabase : RoomDatabase() {
 
     abstract fun postDao(): PostDao
@@ -23,7 +23,7 @@ abstract class PostDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     PostDatabase::class.java,
-                    "event_db"
+                    "post_db"
                 )
                     .addCallback(PostDataBaseCallback())
                     .build()
@@ -33,7 +33,7 @@ abstract class PostDatabase : RoomDatabase() {
         }
     }
 
-    private class PostDataBaseCallback : RoomDatabase.Callback(){
+    private class PostDataBaseCallback :Callback(){
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             db.execSQL("INSERT INTO tags (name) VALUES ('Спорт'), ('Музыка'), ('Кино'), ('Образование'), ('Технологии')")

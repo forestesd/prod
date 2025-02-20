@@ -168,13 +168,13 @@ fun AddGoalOrTransactionDialog(
                             isSumValid = sum.isNotBlank() && true && enteredSum > 0
                             typeTransactionValid = typeOfTransaction.isNotBlank()
 
-                            if (isGoalNameValid && isSumValid && typeTransactionValid) {
-                                if (dialogType == "goal") {
+                            if (isGoalNameValid && isSumValid ) {
+                                if (dialogType == "goal" ) {
                                     onAddGoal(
                                         goalName,
                                         sum.toBigDecimal(),
                                         dateOrComment.takeIf { it.isNotEmpty() })
-                                } else if (correctSum) {
+                                } else if (correctSum && typeTransactionValid) {
                                     addTransaction(
                                         goalName,
                                         sum.toBigDecimal(),
@@ -218,13 +218,13 @@ fun PositiveAndNegativeButton(
 
 @Composable
 fun GoalDropDown(
-    selectedGoalOrTransaction: String?,
+    selectedItem: String?,
     text: String,
-    goals: List<String>,
-    onGoalSelected: (String) -> Unit
+    items: List<String>,
+    onItemSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf(selectedGoalOrTransaction ?: "") }
+    var selected by remember { mutableStateOf(selectedItem ?: "") }
 
     Column {
         OutlinedTextField(
@@ -247,12 +247,12 @@ fun GoalDropDown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            goals.forEach { goal ->
+            items.forEach { goal ->
                 DropdownMenuItem(
                     text = { Text(goal) },
                     onClick = {
                         selected = goal
-                        onGoalSelected(goal)
+                        onItemSelected(goal)
                         expanded = false
                     }
                 )

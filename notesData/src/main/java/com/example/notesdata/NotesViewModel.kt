@@ -10,7 +10,7 @@ import com.example.notesdata.db.PostImageDao
 import com.example.notesdata.db.PostImageEntity
 import com.example.notesdata.db.PostTagDao
 import com.example.notesdata.db.TagDao
-import com.example.notesdata.db.TagEntitiy
+import com.example.notesdata.db.TagEntity
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,20 +23,29 @@ class NotesViewModel @Inject constructor(
 
 ) : AndroidViewModel(application) {
 
-    private val _allTags = mutableStateOf<List<TagEntitiy>>(emptyList())
-    val allTags: State<List<TagEntitiy>> = _allTags
+    private val _allTags = mutableStateOf<List<TagEntity>>(emptyList())
+    val allTags: State<List<TagEntity>> = _allTags
 
-    fun saveImageUri(uri: String) {
-        viewModelScope.launch {
-            val photo = PostImageEntity(eventId = 1, photoUrl = uri)
-            postImageDao.insertPhoto(photo)
-        }
-    }
+    private val _allImages = mutableStateOf<List<PostImageEntity>>(emptyList())
+    val allImages: State<List<PostImageEntity>> = _allImages
+
 
     fun getAllTags() {
         viewModelScope.launch {
             _allTags.value = tagDao.getAllTags()
         }
-
     }
+
+    fun getAllNotes(){
+        viewModelScope.launch {
+            val allPost = postDao.getAllPosts()
+            allPost.forEach{ post ->
+                val images = postImageDao.getImageByEventId(post.id)
+                val tags = postTagDao.getTagsForPost(post.id)
+                val allPostTag = tags.map { tagDao.getTagById(it.tagId) }
+                PostMaperUi(post =  post, image =  images, tags = allPostTag)
+            }
+        }
+    }
+
 }

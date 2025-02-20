@@ -9,7 +9,7 @@ import androidx.room.Update
 @Dao
 interface PostDao {
     @Insert
-    suspend fun insertPost(post: PostEntity)
+    suspend fun insertPost(post: PostEntity): Long
 
     @Update
     suspend fun updatePost(post: PostEntity)
@@ -19,37 +19,44 @@ interface PostDao {
 
     @Query("SELECT * FROM post WHERE id = :id LIMIT 1")
     suspend fun getPostById(id: Long): PostEntity?
+
+    @Query("SELECT * FROM post")
+    suspend fun getAllPosts(): List<PostEntity>
 }
 
 @Dao
 interface PostImageDao {
     @Insert
-    suspend fun insertPhoto(photo: PostImageEntity)
+    suspend fun insertImage(photo: PostImageEntity)
 
-    @Query("SELECT * FROM post_images WHERE event_id = :eventId")
-    suspend fun getPhotosByEventId(eventId: Long): List<PostImageEntity>
+    @Query("SELECT * FROM post_images WHERE post_id = :postId")
+    suspend fun getImageByEventId(postId: Long): List<PostImageEntity>
+
 }
 
 @Dao
 interface TagDao {
+
     @Insert
-    suspend fun insertTag(tagEntitiy: TagEntitiy)
+    suspend fun insertTags(tagsEntitiy: List<TagEntity>)
 
     @Query("SELECT * FROM tags")
-    suspend fun getAllTags(): List<TagEntitiy>
+    suspend fun getAllTags(): List<TagEntity>
 
-    @Query("SELECT * FROM tags WHERE id IN (:tagIds)")
-    suspend fun getTagsByIds(tagIds: List<Long>): List<TagEntitiy>
+    @Query("SELECT * FROM tags WHERE name = :tagName")
+    suspend fun getTagByName(tagName: String): TagEntity
+    @Query("SELECT * FROM tags WHERE id = :tagId")
+    suspend fun getTagById(tagId: Long): TagEntity
 }
 
 @Dao
 interface PostTagDao {
     @Insert
-    suspend fun insertEventTag(eventTag: PostTagEntity)
+    suspend fun insertPostTag(eventTag: PostTagEntity)
 
-    @Query("SELECT * FROM post_tags WHERE post_id = :eventId")
-    suspend fun getTagsForEvent(eventId: Long): List<PostTagEntity>
+    @Query("SELECT * FROM post_tags WHERE post_id = :postId")
+    suspend fun getTagsForPost(postId: Long): List<PostTagEntity>
 
-    @Query("DELETE FROM post_tags WHERE post_id = :eventId AND tag_id = :tagId")
-    suspend fun removeTagFromEvent(eventId: Long, tagId: Long)
+    @Query("DELETE FROM post_tags WHERE post_id = :postId AND tag_id = :tagId")
+    suspend fun removeTagFromPost(postId: Long, tagId: Long)
 }

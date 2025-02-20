@@ -11,6 +11,7 @@ import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
+import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
 import com.example.notesdata.db.PostDao
 import com.example.notesdata.db.PostDatabase
@@ -24,6 +25,7 @@ import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -145,6 +147,7 @@ class PostDatabaseModile{
         return postDatabase.postTagDao()
     }
 }
+
 @Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class , PostDatabaseModile::class, AppModule::class])
 @Singleton
 interface AppComponent {
@@ -154,4 +157,5 @@ interface AppComponent {
     fun inject(newsRepository: NewsRepository)
     fun inject(financeViewModel: FinanceViewModel)
     fun inject(notesViewModel: NotesViewModel)
+    fun inject(addNoteViewModel: AddNoteViewModel)
 }

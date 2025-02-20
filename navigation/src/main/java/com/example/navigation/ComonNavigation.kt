@@ -16,6 +16,7 @@ import com.example.financedate.FinanceViewModel
 import com.example.financeui.FinanceMainScreen
 import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews
+import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
 import com.example.notesui.NotesMainScreen
 import com.example.tickersapi.TickersViewModel
@@ -28,6 +29,7 @@ fun AppNavigation(
     newsViewModel: NewsViewModel,
     financeViewModel: FinanceViewModel,
     notesViewModel: NotesViewModel,
+    addNoteViewModel: AddNoteViewModel,
     onPickImageClick: () -> Unit
 ) {
 
@@ -75,7 +77,7 @@ fun AppNavigation(
                 FinanceMainScreen(financeViewModel)
             }
             composable("notes") {
-               NotesMainScreen(notesViewModel, onPickImageClick)
+               NotesMainScreen(notesViewModel, addNoteViewModel,onPickImageClick)
             }
         }
     }

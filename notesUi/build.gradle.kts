@@ -37,6 +37,8 @@ dependencies {
     implementation(project(":notesData"))
     implementation(project(":financeUi"))
 
+    implementation("io.coil-kt:coil-compose:2.1.0")
+
     implementation(platform(libs.androidx.compose.bom))
     implementation ("androidx.compose.material3:material3:1.1.0")
 

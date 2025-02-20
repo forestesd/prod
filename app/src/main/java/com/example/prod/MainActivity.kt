@@ -10,6 +10,7 @@ import androidx.core.view.WindowCompat
 import com.example.apis.NewsViewModel
 import com.example.financedate.FinanceViewModel
 import com.example.navigation.AppNavigation
+import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
 import com.example.tickersapi.TickersViewModel
 import javax.inject.Inject
@@ -24,10 +25,11 @@ class MainActivity : ComponentActivity() {
     lateinit var financeViewModel: FinanceViewModel
     @Inject
     lateinit var notesViewModel: NotesViewModel
+    @Inject
+    lateinit var addNoteViewModel: AddNoteViewModel
 
-
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { notesViewModel.saveImageUri(it.toString()) }
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uri: List<Uri>? ->
+        uri?.let { addNoteViewModel.saveImageUri(uri) }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +42,8 @@ class MainActivity : ComponentActivity() {
             pickImageLauncher.launch("image/*")
         }
         setContent {
-            AppNavigation(tickersViewModel, newsViewModel, financeViewModel, notesViewModel,
-                { openGallery() })
+            AppNavigation(tickersViewModel, newsViewModel, financeViewModel, notesViewModel,addNoteViewModel
+            ) { openGallery() }
         }
 
 
