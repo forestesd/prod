@@ -18,11 +18,11 @@ import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews
 import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
+import com.example.notesdata.db.NewsEntity
 import com.example.notesui.AddNoteScreen
 import com.example.notesui.NotesMainScreen
 import com.example.tickersapi.TickersViewModel
 import com.example.ui.NavigationUI
-import com.example.ui.Newsfeed
 
 @Composable
 fun AppNavigation(
@@ -65,10 +65,10 @@ fun AppNavigation(
                     val encodeImgeUrl = newsViewModel.getImageUrlForArticle(it)
                     val encodeNewsUrl = Uri.encode(it.url)
                     val encodeTitle = it.title
-                    navController.navigate("webViewNews/$encodeImgeUrl/$encodeNewsUrl/$encodeTitle")
+                    navController.navigate("webViewNews?imageUrl=$encodeImgeUrl&newsUrl=$encodeNewsUrl&title=$encodeTitle")
                 }, tickersViewModel)
             }
-            composable("webViewNews/{imageUrl}/{newsUrl}/{title}") {
+            composable("webViewNews?imageUrl={imageUrl}&newsUrl={newsUrl}&title={title}") {
                 val newsUrl = it.arguments?.getString("newsUrl").toString()
                 val imageUrl = it.arguments?.getString("imageUrl").toString()
                 val title = it.arguments?.getString("title").toString()
@@ -76,21 +76,37 @@ fun AppNavigation(
                     newsUrl,
                     newsViewModel,
                     tickersViewModel,
-                    onBack = {navController.navigate("main")}
+                    onBack = { navController.navigate("main") },
+                    onShare = {
+                        navController.navigate("addNote?imageUrl=$imageUrl&newsUrl=$newsUrl&title=$title")
+                    }
                 )
             }
             composable("finance") {
                 FinanceMainScreen(financeViewModel)
             }
             composable("notes") {
-                NotesMainScreen(notesViewModel, addNoteViewModel, onPickImageClick, {navController.navigate("addNote")})
+                NotesMainScreen(
+                    notesViewModel,
+                    onNewsClicked = { navController.navigate("webViewNews?imageUrl=${it.imageUrl}&newsUrl=${it.newsUrl}&title=${it.title}") },
+                    onAddButtonClicked = { navController.navigate("addNote") }
+                )
             }
-            composable("addNote") {
+            composable("addNote?imageUrl={imageUrl}&newsUrl={newsUrl}&title={title}") {
+                val newsUrl = it.arguments?.getString("newsUrl").toString()
+                val imageUrl = it.arguments?.getString("imageUrl").toString()
+                val title = it.arguments?.getString("title").toString()
+
                 AddNoteScreen(
                     onBack = { navController.navigate("notes") },
                     onPickImage = onPickImageClick,
                     addNoteViewModel = addNoteViewModel,
-                    notesViewModel = notesViewModel
+                    notesViewModel = notesViewModel,
+                    news = NewsEntity(
+                        imageUrl = imageUrl,
+                        articleUrl = newsUrl,
+                        title = title
+                    )
                 )
             }
         }

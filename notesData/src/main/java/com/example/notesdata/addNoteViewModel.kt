@@ -7,19 +7,18 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notesdata.db.NewsDao
+import com.example.notesdata.db.NewsEntity
 import com.example.notesdata.db.PostDao
 import com.example.notesdata.db.PostEntity
 import com.example.notesdata.db.PostImageDao
 import com.example.notesdata.db.PostImageEntity
 import com.example.notesdata.db.PostTagDao
 import com.example.notesdata.db.PostTagEntity
-import com.example.notesdata.db.TagDao
 import com.example.notesdata.db.TagEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,8 +34,8 @@ class AddNoteViewModel @Inject constructor(
     application: Application,
     private val postDao: PostDao,
     private val postImageDao: PostImageDao,
-    private val tagDao: TagDao,
-    private val postTagDao: PostTagDao
+    private val postTagDao: PostTagDao,
+    private val newsDao: NewsDao
 ) : AndroidViewModel(application) {
     private val _selectedImage = MutableStateFlow<List<Uri>>(emptyList())
     val selectedImage: StateFlow<List<Uri>> get() = _selectedImage
@@ -44,7 +43,7 @@ class AddNoteViewModel @Inject constructor(
     private val _selectedTags = mutableStateOf<List<TagEntity>>(emptyList())
     val selectedTags: State<List<TagEntity>> = _selectedTags
 
-    private val _noteContent = mutableStateOf<String>("")
+    private val _noteContent = mutableStateOf("")
 
     fun saveImageUri(uris: List<Uri>) {
         _selectedImage.value += uris
@@ -58,16 +57,21 @@ class AddNoteViewModel @Inject constructor(
         _noteContent.value = content
     }
 
-    fun saveNote(context: Context) {
+    fun saveNote(context: Context, news: NewsEntity?) {
         viewModelScope.launch {
             if (_noteContent.value.isNotBlank()) {
+                if (news != null) newsDao.insertNews(news)
+                val newsId = if (news != null) newsDao.getNewsByUrl(news.articleUrl).id else null
                 val noteId = postDao.insertPost(
                     PostEntity(
                         content = _noteContent.value,
                         createdAt = LocalDateTime.now()
-                            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+                        newsId = newsId
                     )
                 )
+                if (news != null) newsDao.insertNews(news)
+
                 _selectedImage.value.forEach { uri ->
                     postImageDao.insertImage(
                         PostImageEntity(
@@ -78,7 +82,6 @@ class AddNoteViewModel @Inject constructor(
                         )
                     )
                 }
-                val images = postImageDao.getImageByEventId(noteId)
                 _selectedTags.value.forEach { tag ->
                     postTagDao.insertPostTag(PostTagEntity(postId = noteId, tagId = tag.id))
                 }
@@ -102,7 +105,7 @@ class AddNoteViewModel @Inject constructor(
 
         val rotatedUri = rotateImageIfNeeded(context, imageUri)
 
-        val compressedUri = compressImage(context, rotatedUri, quality = 50)
+        val compressedUri = compressImage(context, rotatedUri)
 
         return compressedUri?.let {
             val inputStream = contentResolver.openInputStream(it)
@@ -155,7 +158,8 @@ class AddNoteViewModel @Inject constructor(
         }
     }
 
-    private fun compressImage(context: Context, imageUri: Uri, quality: Int = 80): Uri? {
+    private fun compressImage(context: Context, imageUri: Uri): Uri? {
+        val quality = 40
         val contentResolver = context.contentResolver
         val inputStream: InputStream? = contentResolver.openInputStream(imageUri)
 
@@ -163,7 +167,7 @@ class AddNoteViewModel @Inject constructor(
             inJustDecodeBounds = true
             BitmapFactory.decodeStream(inputStream, null, this)
 
-            val scale = calculateInSampleSize(this, 800, 800)
+            val scale = calculateInSampleSize(this)
             inSampleSize = scale
             inJustDecodeBounds = false
         }
@@ -187,9 +191,10 @@ class AddNoteViewModel @Inject constructor(
 
     private fun calculateInSampleSize(
         options: BitmapFactory.Options,
-        reqWidth: Int,
-        reqHeight: Int
-    ): Int {
+
+        ): Int {
+        val reqWidth = 800
+        val reqHeight = 800
         val height = options.outHeight
         val width = options.outWidth
         var inSampleSize = 1

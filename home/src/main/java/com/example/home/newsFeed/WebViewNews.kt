@@ -2,10 +2,14 @@ package com.example.home.newsFeed
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +30,8 @@ fun WebViewNews(
     newsUrl: String,
     newsViewModel: NewsViewModel,
     tickersViewModel: TickersViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onShare: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         newsViewModel.setIsSearching(false)
@@ -38,11 +43,22 @@ fun WebViewNews(
         TopAppBar(
             title = { Text(text = "Новости") },
             navigationIcon = {
-                IconButton(
-                    onClick = { onBack() }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Стрелка назад")
+                    IconButton(
+                        onClick = { onBack() }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Стрелка назад")
+                    }
+                    IconButton(
+                        onClick = { onShare() }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Поделиться")
+                    }
                 }
+
             },
             colors = TopAppBarDefaults.topAppBarColors(Color.White)
         )

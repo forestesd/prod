@@ -1,19 +1,16 @@
 package com.example.notesui
 
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,9 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
+import com.example.notesdata.db.NewsEntity
 import com.example.notesdata.db.TagEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,15 +56,15 @@ fun AddNoteScreen(
     onBack: () -> Unit,
     onPickImage: () -> Unit,
     addNoteViewModel: AddNoteViewModel,
-    notesViewModel: NotesViewModel
+    notesViewModel: NotesViewModel,
+    news: NewsEntity? = null
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         notesViewModel.getAllTags()
     }
     var noteContent by remember { mutableStateOf("") }
-    var noteTags by remember { mutableStateOf("") }
-    var isGoalNameValid by remember { mutableStateOf(true) }
+    var isContentValid by remember { mutableStateOf(true) }
 
     val selectedTags by addNoteViewModel.selectedTags
 
@@ -100,7 +95,7 @@ fun AddNoteScreen(
         )
 
         PickImages(selectedImage, onPickImage = onPickImage)
-        if (!isGoalNameValid){
+        if (!isContentValid){
             Text(
                 text = "Введите текст заметки!!!",
                 fontSize = 16.sp,
@@ -111,7 +106,7 @@ fun AddNoteScreen(
             value = noteContent,
             onValueChange = {
                 noteContent = it
-                isGoalNameValid = it.isNotBlank()
+                isContentValid = it.isNotBlank()
             },
             label = { Text("Содержание") },
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp, max = 150.dp).padding(horizontal = 16.dp)
@@ -125,7 +120,7 @@ fun AddNoteScreen(
         Button(
             onClick = {
                 addNoteViewModel.saveNoteContent(noteContent)
-                addNoteViewModel.saveNote(context)
+                addNoteViewModel.saveNote(context, news = news)
                 onBack()
                 notesViewModel.getAllNotes()
             },

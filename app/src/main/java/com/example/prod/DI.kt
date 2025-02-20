@@ -13,6 +13,7 @@ import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
 import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
+import com.example.notesdata.db.NewsDao
 import com.example.notesdata.db.PostDao
 import com.example.notesdata.db.PostDatabase
 import com.example.notesdata.db.PostImageDao
@@ -25,7 +26,6 @@ import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -145,6 +145,11 @@ class PostDatabaseModile{
     @Singleton
     fun providePostTagDao(postDatabase: PostDatabase): PostTagDao {
         return postDatabase.postTagDao()
+    }
+    @Provides
+    @Singleton
+    fun provideNewsDao(postDatabase: PostDatabase): NewsDao{
+        return postDatabase.newsDao()
     }
 }
 
