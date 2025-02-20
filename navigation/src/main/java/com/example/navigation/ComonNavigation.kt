@@ -18,6 +18,7 @@ import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews
 import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
+import com.example.notesui.AddNoteScreen
 import com.example.notesui.NotesMainScreen
 import com.example.tickersapi.TickersViewModel
 import com.example.ui.NavigationUI
@@ -61,23 +62,36 @@ fun AppNavigation(
         ) {
             composable("main") {
                 MainScreen(newsViewModel, {
-                    val encodeUrl = Uri.encode(it)
-                    navController.navigate("webViewNews/$encodeUrl")
+                    val encodeImgeUrl = newsViewModel.getImageUrlForArticle(it)
+                    val encodeNewsUrl = Uri.encode(it.url)
+                    val encodeTitle = it.title
+                    navController.navigate("webViewNews/$encodeImgeUrl/$encodeNewsUrl/$encodeTitle")
                 }, tickersViewModel)
             }
-            composable("webViewNews/{url}") {
-                val decodeUrl = it.arguments?.getString("url").toString()
+            composable("webViewNews/{imageUrl}/{newsUrl}/{title}") {
+                val newsUrl = it.arguments?.getString("newsUrl").toString()
+                val imageUrl = it.arguments?.getString("imageUrl").toString()
+                val title = it.arguments?.getString("title").toString()
                 WebViewNews(
-                    decodeUrl,
+                    newsUrl,
                     newsViewModel,
-                    tickersViewModel
-                ) { navController.navigate("main") }
+                    tickersViewModel,
+                    onBack = {navController.navigate("main")}
+                )
             }
             composable("finance") {
                 FinanceMainScreen(financeViewModel)
             }
             composable("notes") {
-               NotesMainScreen(notesViewModel, addNoteViewModel,onPickImageClick)
+                NotesMainScreen(notesViewModel, addNoteViewModel, onPickImageClick, {navController.navigate("addNote")})
+            }
+            composable("addNote") {
+                AddNoteScreen(
+                    onBack = { navController.navigate("notes") },
+                    onPickImage = onPickImageClick,
+                    addNoteViewModel = addNoteViewModel,
+                    notesViewModel = notesViewModel
+                )
             }
         }
     }

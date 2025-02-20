@@ -10,9 +10,16 @@ import androidx.room.PrimaryKey
 data class PostEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "content") val content: String,
-    @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "created_at") val createdAt: String,
+    @ColumnInfo(name = "news_id") val newsId: Long? = null
 )
-
+@Entity(tableName = "news")
+data class NewsEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "image_url") val imageUrl: String,
+    @ColumnInfo(name = "article_url") val articleUrl: String,
+    @ColumnInfo(name = "title") val title: String
+)
 
 @Entity(tableName = "post_images", foreignKeys = [
     ForeignKey(entity = PostEntity::class,

@@ -29,22 +29,32 @@ class NotesViewModel @Inject constructor(
     private val _allImages = mutableStateOf<List<PostImageEntity>>(emptyList())
     val allImages: State<List<PostImageEntity>> = _allImages
 
+    private val _allPosts = mutableStateOf<List<PostUi>>(emptyList())
+    val allPosts: State<List<PostUi>> = _allPosts
+
 
     fun getAllTags() {
         viewModelScope.launch {
             _allTags.value = tagDao.getAllTags()
         }
     }
+    fun getAllImages(){
+        viewModelScope.launch {
+            _allImages.value = postImageDao.getAllImage()
+        }
+    }
 
     fun getAllNotes(){
         viewModelScope.launch {
+            val posts = mutableListOf<PostUi>()
             val allPost = postDao.getAllPosts()
             allPost.forEach{ post ->
                 val images = postImageDao.getImageByEventId(post.id)
                 val tags = postTagDao.getTagsForPost(post.id)
                 val allPostTag = tags.map { tagDao.getTagById(it.tagId) }
-                PostMaperUi(post =  post, image =  images, tags = allPostTag)
+             posts.add(postMapperUi(post =  post, image =  images, tags = allPostTag))
             }
+            _allPosts.value = posts
         }
     }
 

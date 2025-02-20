@@ -28,8 +28,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var addNoteViewModel: AddNoteViewModel
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uri: List<Uri>? ->
-        uri?.let { addNoteViewModel.saveImageUri(uri) }
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        uris?.takeIf { it.isNotEmpty() }?.let { selectedUris ->
+            val limitedUris = selectedUris.take(2)
+            addNoteViewModel.saveImageUri(limitedUris)
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

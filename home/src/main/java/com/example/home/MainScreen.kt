@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.apis.Article
 import com.example.apis.NewsViewModel
 import com.example.home.newsFeed.NewsFeedMain
 import com.example.home.newsFeed.ProgressBar
@@ -22,7 +23,7 @@ import com.example.tickersapi.TickersViewModel
 @Composable
 fun MainScreen(
     newsViewModel: NewsViewModel,
-    onCardClicked: (String) -> Unit,
+    onCardClicked: (Article) -> Unit,
     tickersViewModel: TickersViewModel
 
 ) {

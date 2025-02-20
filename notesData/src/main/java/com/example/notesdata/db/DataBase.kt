@@ -6,13 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [PostEntity::class, PostImageEntity::class, TagEntity::class, PostTagEntity::class], version = 1)
+@Database(entities = [PostEntity::class, PostImageEntity::class, TagEntity::class, PostTagEntity::class, NewsEntity::class], version = 1)
 abstract class PostDatabase : RoomDatabase() {
 
     abstract fun postDao(): PostDao
     abstract fun postImageDao(): PostImageDao
     abstract fun tagDao(): TagDao
     abstract fun postTagDao(): PostTagDao
+    abstract fun newsDao(): NewsDao
 
     companion object {
         @Volatile

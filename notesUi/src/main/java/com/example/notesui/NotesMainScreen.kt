@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -29,13 +30,11 @@ fun NotesMainScreen(
     notesViewModel: NotesViewModel,
     addNoteViewModel: AddNoteViewModel,
     onPickImageClick: () -> Unit,
+    onAddButtonClicked: () -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        notesViewModel.getAllImages()
-    }
 
-    var showAddNoteDialog by remember { mutableStateOf(false) }
-    val image by notesViewModel.allImages
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -51,27 +50,9 @@ fun NotesMainScreen(
 
 
 
-        AddNote(onAddNote = { showAddNoteDialog = true })
-        if (showAddNoteDialog) {
-            AddNoteDialog(
-                onBack = { showAddNoteDialog = false },
-                onPickImage = onPickImageClick,
-                addNoteViewModel = addNoteViewModel,
-                notesViewModel = notesViewModel
-            )
-        }
-        LazyColumn {
-            items(image) { uri ->
-                AsyncImage(
-                    model = uri.photoUrl,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "Выбранное изображение",
-                    modifier = Modifier
-                        .size(450.dp)
-                        .padding(4.dp),
-                )
-            }
-        }
+        AddNote(onAddNote = onAddButtonClicked)
+
+        NotesFeed(notesViewModel)
 
     }
 }

@@ -34,7 +34,7 @@ import com.example.home.PxToDp
 import com.example.home.R
 
 @Composable
-fun <T> NewsFeedMain(news: List<T>, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
+fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel, onCardClicked: (Article) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,27 +42,12 @@ fun <T> NewsFeedMain(news: List<T>, viewModel: NewsViewModel, onCardClicked: (St
         contentPadding = PaddingValues(16.dp),
 
         ) {
-        items(news, key = { item ->
-            when (item) {
-                is Article -> item.title
-                is Docs -> item.web_url
-                else -> "Unknown"
-            }
-        }) { item ->
+        items(news, key = { item -> item.title }) { item ->
             NewsCrad(
-                when (item) {
-                    is Article -> item
-                    is Docs -> item
-                    else -> "Unknown"
-                }, viewModel
+                item, viewModel
             ) {
                 onCardClicked(
-                    when (item) {
-                        is Article -> item.url
-                        is Docs -> item.web_url
-                        else -> "Unknown"
-                    }.toString()
-
+                     item
                 )
             }
 
@@ -71,12 +56,9 @@ fun <T> NewsFeedMain(news: List<T>, viewModel: NewsViewModel, onCardClicked: (St
 }
 
 @Composable
-fun <T> NewsCrad(item: T, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
-    val imageUrl = when (item) {
-        is Article -> viewModel.getImageUrlForArticle(item)
-        is Docs -> viewModel.getImageUrlForDocs(item)
-        else -> null
-    }
+fun NewsCrad(item: Article, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
+    val imageUrl = viewModel.getImageUrlForArticle(item)
+
 
     Card(
         modifier = Modifier
@@ -84,18 +66,9 @@ fun <T> NewsCrad(item: T, viewModel: NewsViewModel, onCardClicked: (String) -> U
             .wrapContentHeight(),
         shape = RoundedCornerShape(12.dp),
         onClick = {
-
-            when (item) {
-                is Article -> item.url
-                is Docs -> item.web_url
-                else -> "Unknown"
-            }.let {
-                onCardClicked(
-                    it
-                )
-
-            }
-
+            onCardClicked(
+                item.url
+            )
         }
     ) {
         Column(
@@ -115,7 +88,7 @@ fun <T> NewsCrad(item: T, viewModel: NewsViewModel, onCardClicked: (String) -> U
 }
 
 @Composable
-fun <T> NewsMain(newsItem: T, imageUrl: String?) {
+fun NewsMain(newsItem: Article, imageUrl: String?) {
 
     AsyncImage(
         model = imageUrl,
@@ -130,52 +103,29 @@ fun <T> NewsMain(newsItem: T, imageUrl: String?) {
         contentDescription = "News Image"
     )
 
-    when (newsItem) {
-        is Article -> newsItem.title
-        is Docs -> newsItem.headline?.main
-        else -> "Unknown"
-    }?.let {
-        Text(
-        text = it,
+    Text(
+        text = newsItem.title,
         modifier = Modifier.padding(top = 10.dp),
         fontSize = 16.sp,
+    )
 
-        )
-    }
-
-    when (newsItem) {
-        is Article -> newsItem.abstract
-        is Docs -> newsItem.abstract
-        else-> "Unknown"
-    }.let {
-        Text(
-            text = it,
-            modifier = Modifier.padding(top = 12.dp),
-            fontSize = 12.sp
-        )
-    }
+    Text(
+        text = newsItem.abstract,
+        modifier = Modifier.padding(top = 12.dp),
+        fontSize = 12.sp
+    )
 }
 
 
 @Composable
-fun <T> PublishedSource(newsItem: T) {
+fun PublishedSource(newsItem: Article) {
     Row(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 12.dp),
     ) {
         Text(
-            text = "${
-                when (newsItem) {
-                    is Article -> newsItem.source
-                    is Docs -> newsItem.source
-                    else -> "Unknown"
-                }
-            } • ${ when (newsItem) {
-                is Article -> newsItem.subsection
-                is Docs -> newsItem.subsection_name ?: ""
-                else -> "Unknown"
-            }}",
+            text = "${newsItem.source} • ${newsItem.subsection}",
             fontSize = 10.sp
         )
         Spacer(
@@ -183,16 +133,10 @@ fun <T> PublishedSource(newsItem: T) {
                 .weight(1f)
                 .width(0.dp)
         )
-        when (newsItem) {
-            is Article -> newsItem.published_date
-            is Docs -> newsItem.pub_date
-            else -> "Unknown"
-        }.let {
-            Text(
-                text = it,
-                fontSize = 10.sp
-            )
-        }
+        Text(
+            text = newsItem.published_date,
+            fontSize = 10.sp
+        )
 
     }
 }

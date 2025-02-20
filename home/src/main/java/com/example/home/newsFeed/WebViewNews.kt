@@ -23,7 +23,7 @@ import com.example.tickersapi.TickersViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebViewNews(
-    url: String,
+    newsUrl: String,
     newsViewModel: NewsViewModel,
     tickersViewModel: TickersViewModel,
     onBack: () -> Unit
@@ -54,7 +54,7 @@ fun WebViewNews(
                 WebView(context).apply {
                     settings.javaScriptEnabled = true
                     webViewClient = WebViewClient()
-                    loadUrl(url)
+                    loadUrl(newsUrl)
                 }
             },
             modifier = Modifier.fillMaxSize(),

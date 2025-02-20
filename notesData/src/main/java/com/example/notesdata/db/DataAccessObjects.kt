@@ -20,7 +20,7 @@ interface PostDao {
     @Query("SELECT * FROM post WHERE id = :id LIMIT 1")
     suspend fun getPostById(id: Long): PostEntity?
 
-    @Query("SELECT * FROM post")
+    @Query("SELECT * FROM post ORDER BY created_at DESC")
     suspend fun getAllPosts(): List<PostEntity>
 }
 
@@ -32,6 +32,18 @@ interface PostImageDao {
     @Query("SELECT * FROM post_images WHERE post_id = :postId")
     suspend fun getImageByEventId(postId: Long): List<PostImageEntity>
 
+    @Query("SELECT * FROM post_images")
+    suspend fun getAllImage():List<PostImageEntity>
+
+}
+
+@Dao
+interface NewsDao{
+    @Insert
+    suspend fun insertNews(news: NewsEntity)
+
+    @Query("SELECT *  FROM news WHERE article_url = :url")
+    suspend fun getNewsbyUrl(url: String): NewsEntity
 }
 
 @Dao

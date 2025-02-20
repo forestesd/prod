@@ -54,7 +54,6 @@ fun AddNote(
             Text(
                 text = "Добавить событие",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
         }

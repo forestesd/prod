@@ -2,8 +2,10 @@ package com.example.notesdata
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
@@ -25,6 +27,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class AddNoteViewModel @Inject constructor(
@@ -41,10 +45,9 @@ class AddNoteViewModel @Inject constructor(
     val selectedTags: State<List<TagEntity>> = _selectedTags
 
     private val _noteContent = mutableStateOf<String>("")
-    val noteContent: State<String> = _noteContent
 
     fun saveImageUri(uris: List<Uri>) {
-        _selectedImage.value = uris
+        _selectedImage.value += uris
     }
 
     fun saveTags(tags: List<TagEntity>) {
@@ -58,7 +61,13 @@ class AddNoteViewModel @Inject constructor(
     fun saveNote(context: Context) {
         viewModelScope.launch {
             if (_noteContent.value.isNotBlank()) {
-                val noteId = postDao.insertPost(PostEntity(content = _noteContent.value))
+                val noteId = postDao.insertPost(
+                    PostEntity(
+                        content = _noteContent.value,
+                        createdAt = LocalDateTime.now()
+                            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                    )
+                )
                 _selectedImage.value.forEach { uri ->
                     postImageDao.insertImage(
                         PostImageEntity(
@@ -70,12 +79,18 @@ class AddNoteViewModel @Inject constructor(
                     )
                 }
                 val images = postImageDao.getImageByEventId(noteId)
-                Log.i("Info", images.toString())
                 _selectedTags.value.forEach { tag ->
                     postTagDao.insertPostTag(PostTagEntity(postId = noteId, tagId = tag.id))
                 }
             }
+            clearData()
         }
+    }
+
+    fun clearData() {
+        _selectedImage.value = emptyList()
+        _selectedTags.value = emptyList()
+        _noteContent.value = ""
     }
 
     private fun saveImageToAppDirectory(context: Context, imageUri: Uri): Uri? {
@@ -85,27 +100,64 @@ class AddNoteViewModel @Inject constructor(
         val appContext = context.applicationContext
         val contentResolver = appContext.contentResolver
 
+        val rotatedUri = rotateImageIfNeeded(context, imageUri)
 
-        val compressedUri = compressImage(context, imageUri, quality = 1)
-
+        val compressedUri = compressImage(context, rotatedUri, quality = 50)
 
         return compressedUri?.let {
             val inputStream = contentResolver.openInputStream(it)
-            val outputStream = FileOutputStream(File(appContext.filesDir, fileName))
 
+            val file = File(appContext.getExternalFilesDir(null), fileName)
+
+            val outputStream = FileOutputStream(file)
             inputStream?.copyTo(outputStream)
             inputStream?.close()
             outputStream.close()
 
-            Uri.fromFile(File(appContext.filesDir, fileName))
+            Uri.fromFile(file)
         }
     }
 
+    private fun rotateImageIfNeeded(context: Context, imageUri: Uri): Uri {
+        val inputStream = context.contentResolver.openInputStream(imageUri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+
+        val matrix = Matrix()
+        val orientation = getImageOrientation(imageUri, context)
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            matrix.postRotate(90f)
+        }
+
+        val rotatedBitmap =
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+
+        val fileName = "rotated_${System.currentTimeMillis()}.jpg"
+        val file = File(context.getExternalFilesDir(null), fileName)
+        val outputStream = FileOutputStream(file)
+
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+
+        return Uri.fromFile(file)
+    }
+
+    private fun getImageOrientation(imageUri: Uri, context: Context): Int {
+        val inputStream = context.contentResolver.openInputStream(imageUri)
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+
+        BitmapFactory.decodeStream(inputStream, null, options)
+
+        return if (options.outWidth > options.outHeight) {
+            Configuration.ORIENTATION_LANDSCAPE
+        } else {
+            Configuration.ORIENTATION_PORTRAIT
+        }
+    }
 
     private fun compressImage(context: Context, imageUri: Uri, quality: Int = 80): Uri? {
         val contentResolver = context.contentResolver
         val inputStream: InputStream? = contentResolver.openInputStream(imageUri)
-
 
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
@@ -117,7 +169,8 @@ class AddNoteViewModel @Inject constructor(
         }
 
 
-        val bitmap: Bitmap? = BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
+        val bitmap: Bitmap? =
+            BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
 
 
         val fileName = "compressed_image_${System.currentTimeMillis()}.jpg"
@@ -132,8 +185,11 @@ class AddNoteViewModel @Inject constructor(
     }
 
 
-    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int
+    ): Int {
         val height = options.outHeight
         val width = options.outWidth
         var inSampleSize = 1
