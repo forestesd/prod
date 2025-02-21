@@ -5,6 +5,7 @@ data class PostUi(
     val content: String,
     val images: List<String>,
     val tags: List<String>,
+    val isFavorite: Boolean = false,
     val news: NewsPostUi? = null
     )
 

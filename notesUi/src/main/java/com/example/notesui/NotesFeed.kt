@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,16 +53,23 @@ fun NotesFeed(
     notesViewModel: NotesViewModel,
     onNewsClicked: (NewsPostUi) -> Unit
 ) {
-    LaunchedEffect(Unit) {
+    val posts by notesViewModel.allPosts
+
+    LaunchedEffect(posts) {
         notesViewModel.getAllNotes()
     }
-    val posts by notesViewModel.allPosts
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(posts) { item ->
             var expanded by remember { mutableStateOf(false) }
 
+            val isFavorite = notesViewModel.favoritePosts[item.postId] ?: false
+
+            LaunchedEffect(item.postId) {
+                notesViewModel.checkFavorite(item.postId)
+            }
             val fullText = item.content
             val showMoreText = " Ещё"
             val truncatedText = if (fullText.length > 100) fullText.take(120) + "..." else fullText
@@ -126,30 +135,40 @@ fun NotesFeed(
                         .padding(10.dp)
                         .clickable { expanded = !expanded }
                 )
-                LazyRow(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(item.tags) {
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 10.dp, horizontal = 10.dp)
-                                .height(25.dp)
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(Color.LightGray),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 10.dp),
-                                text = it
-                            )
+                    FavoriteButton(isFavorite) { notesViewModel.toggleFavorite(item.postId) }
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(item.tags) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(vertical = 10.dp, horizontal = 10.dp)
+                                    .height(25.dp)
+                                    .clip(RoundedCornerShape(50.dp))
+                                    .background(Color.LightGray),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 10.dp),
+                                    text = it
+                                )
+                            }
+
                         }
 
+
                     }
-
-
                 }
-                if (item.news != null) {
+
+
+
+
+                if (item.news != null && item.news?.newsUrl != "null") {
                     NewsTab(item.news, onNewsClicked)
                 }
 
@@ -200,7 +219,7 @@ fun NewsTab(
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
-        color =  Color(0xFFD7ADAD).copy(alpha = 0.5f)
+        color = Color(0xFFD7ADAD).copy(alpha = 0.5f)
     ) {
         Row(
             modifier = Modifier
@@ -242,4 +261,18 @@ fun NewsTab(
         }
     }
 
+}
+
+@Composable
+fun FavoriteButton(
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit
+) {
+    IconButton(onClick = onToggleFavorite) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = "Favorite",
+            tint = if (isFavorite) Color.Red else Color.Gray
+        )
+    }
 }

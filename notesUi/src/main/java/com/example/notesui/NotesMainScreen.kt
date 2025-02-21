@@ -20,8 +20,6 @@ fun NotesMainScreen(
     onNewsClicked: (NewsPostUi) -> Unit
 ) {
 
-
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,

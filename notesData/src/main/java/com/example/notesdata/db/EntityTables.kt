@@ -11,6 +11,7 @@ data class PostEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "created_at") val createdAt: String,
+    @ColumnInfo( name = "is_favorites") val ifFavorites: Boolean = false,
     @ColumnInfo(name = "news_id") val newsId: Long? = null
 )
 @Entity(tableName = "news")
@@ -31,7 +32,7 @@ data class NewsEntity(
 )
 data class PostImageEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "post_id") val postId: Long,
+    @ColumnInfo(name = "post_id") var postId: Long,
     @ColumnInfo(name = "image_url") val photoUrl: String,
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
 )
@@ -58,6 +59,6 @@ data class TagEntity(
     indices = [Index(value = ["post_id"]), Index(value = ["tag_id"])]
 )
 data class PostTagEntity(
-    @ColumnInfo(name = "post_id") val postId: Long,
+    @ColumnInfo(name = "post_id") var postId: Long,
     @ColumnInfo(name = "tag_id") val tagId: Long
 )

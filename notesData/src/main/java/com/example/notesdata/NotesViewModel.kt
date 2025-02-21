@@ -2,6 +2,7 @@ package com.example.notesdata
 
 import android.app.Application
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import com.example.notesdata.db.PostImageDao
 import com.example.notesdata.db.PostTagDao
 import com.example.notesdata.db.TagDao
 import com.example.notesdata.db.TagEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +33,8 @@ class NotesViewModel @Inject constructor(
     private val _allPosts = mutableStateOf<List<PostUi>>(emptyList())
     val allPosts: State<List<PostUi>> = _allPosts
 
+    private val _favoritePosts = mutableStateMapOf<Long, Boolean>()
+    val favoritePosts: Map<Long, Boolean> get() = _favoritePosts
 
     fun getAllTags() {
         viewModelScope.launch {
@@ -38,14 +42,31 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun getAllNotes(){
+    fun checkFavorite(id: Long) {
         viewModelScope.launch {
+            val post = postDao.getPostById(id)
+            _favoritePosts[id] = post?.ifFavorites ?: false
+        }
+    }
+
+    fun toggleFavorite(id: Long) {
+        viewModelScope.launch {
+            val currentState = _favoritePosts[id] ?: false
+            val newState = !currentState
+            postDao.updatePostFavoriteStatus(id, newState)
+            _favoritePosts[id] = newState
+        }
+    }
+
+    fun getAllNotes(){
+        viewModelScope.launch(Dispatchers.IO) {
             val posts = mutableListOf<PostUi>()
             val allPost = postDao.getAllPosts()
             allPost.forEach{ post ->
                 val images = postImageDao.getImageByEventId(post.id)
                 val tags = postTagDao.getTagsForPost(post.id)
                 val allPostTag = tags.map { tagDao.getTagById(it.tagId) }
+                _favoritePosts[post.id] = post.ifFavorites
                 val news = if (post.newsId != null) newsDao.getNewsById(post.newsId) else null
              posts.add(postMapperUi(post =  post, image =  images, tags = allPostTag, news = news))
             }

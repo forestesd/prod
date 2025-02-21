@@ -16,6 +16,7 @@ fun postMapperUi(
         content = post.content,
         images = image.map { it.photoUrl },
         tags = tags.map { it.name },
+        isFavorite = post.ifFavorites,
         news = if (news != null) NewsPostUi(
             imageUrl = news.imageUrl,
             newsUrl = news.articleUrl,

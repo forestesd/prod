@@ -3,7 +3,9 @@ package com.example.notesdata.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 
 @Dao
@@ -22,6 +24,31 @@ interface PostDao {
 
     @Query("SELECT * FROM post ORDER BY created_at DESC")
     suspend fun getAllPosts(): List<PostEntity>
+
+    @Query("SELECT * FROM post WHERE is_favorites != null")
+    suspend fun getFavoritesPosts():PostEntity
+
+    @Query("UPDATE post SET is_favorites = :isFavorite WHERE id = :id")
+    suspend fun updatePostFavoriteStatus(id: Long, isFavorite: Boolean)
+
+    @Transaction
+    suspend fun insertPostWithImagesAndTags(post: PostEntity, images: List<PostImageEntity>, tags: List<PostTagEntity>): Long {
+
+        val postId = insertPost(post)
+        images.forEach { it.postId = postId }
+        tags.forEach { it.postId = postId }
+
+        insertImages(images)
+        insertTags(tags)
+
+        return postId
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertImages(images: List<PostImageEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTags(tags: List<PostTagEntity>)
 }
 
 @Dao
