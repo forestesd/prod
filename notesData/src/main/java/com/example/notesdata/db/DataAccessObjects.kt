@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
@@ -23,7 +24,7 @@ interface PostDao {
     suspend fun getPostById(id: Long): PostEntity?
 
     @Query("SELECT * FROM post ORDER BY created_at DESC")
-    suspend fun getAllPosts(): List<PostEntity>
+     fun getAllPosts(): Flow<List<PostEntity>>
 
     @Query("SELECT * FROM post WHERE is_favorites != null")
     suspend fun getFavoritesPosts():PostEntity

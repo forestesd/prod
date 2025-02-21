@@ -20,6 +20,7 @@ import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
 import com.example.notesdata.db.NewsEntity
 import com.example.notesui.AddNoteScreen
+import com.example.notesui.FavoritesScreen
 import com.example.notesui.NotesMainScreen
 import com.example.tickersapi.TickersViewModel
 import com.example.ui.NavigationUI
@@ -89,8 +90,16 @@ fun AppNavigation(
                 NotesMainScreen(
                     notesViewModel,
                     onNewsClicked = { navController.navigate("webViewNews?imageUrl=${it.imageUrl}&newsUrl=${it.newsUrl}&title=${it.title}") },
-                    onAddButtonClicked = { navController.navigate("addNote") }
+                    onAddButtonClicked = { navController.navigate("addNote") },
+                    onFavoritesClicked = { navController.navigate("favorites") },
                 )
+            }
+            composable("favorites") {
+                FavoritesScreen(
+                    notesViewModel,
+                    onBack = { navController.navigate("notes") },
+                    onNewsClicked = { navController.navigate("webViewNews?imageUrl=${it.imageUrl}&newsUrl=${it.newsUrl}&title=${it.title}") },
+                    )
             }
             composable("addNote?imageUrl={imageUrl}&newsUrl={newsUrl}&title={title}") {
                 val newsUrl = it.arguments?.getString("newsUrl").toString()

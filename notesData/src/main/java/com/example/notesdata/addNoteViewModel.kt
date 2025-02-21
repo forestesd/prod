@@ -33,8 +33,7 @@ import javax.inject.Inject
 class AddNoteViewModel @Inject constructor(
     application: Application,
     private val postDao: PostDao,
-    private val newsDao: NewsDao,
-    private val notesViewModel: NotesViewModel
+    private val newsDao: NewsDao
 ) : AndroidViewModel(application) {
     private val _selectedImage = MutableStateFlow<List<Uri>>(emptyList())
     val selectedImage: StateFlow<List<Uri>> get() = _selectedImage
@@ -78,10 +77,7 @@ class AddNoteViewModel @Inject constructor(
                 val tags = _selectedTags.value.map { tag ->
                     PostTagEntity(tagId = tag.id, postId = post.id)
                 }
-
                 postDao.insertPostWithImagesAndTags(post, images, tags)
-
-                notesViewModel.getAllNotes()
             }
 
             clearData()
@@ -140,71 +136,70 @@ class AddNoteViewModel @Inject constructor(
             Uri.fromFile(file)
         }
 
-}
 
-private fun getImageOrientation(imageUri: Uri, context: Context): Int {
-    val inputStream = context.contentResolver.openInputStream(imageUri)
-    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    private fun getImageOrientation(imageUri: Uri, context: Context): Int {
+        val inputStream = context.contentResolver.openInputStream(imageUri)
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
 
-    BitmapFactory.decodeStream(inputStream, null, options)
+        BitmapFactory.decodeStream(inputStream, null, options)
 
-    return if (options.outWidth > options.outHeight) {
-        Configuration.ORIENTATION_LANDSCAPE
-    } else {
-        Configuration.ORIENTATION_PORTRAIT
-    }
-}
-
-private fun compressImage(context: Context, imageUri: Uri): Uri? {
-    val quality = 40
-    val contentResolver = context.contentResolver
-    val inputStream: InputStream? = contentResolver.openInputStream(imageUri)
-
-    val options = BitmapFactory.Options().apply {
-        inJustDecodeBounds = true
-        BitmapFactory.decodeStream(inputStream, null, this)
-
-        val scale = calculateInSampleSize(this)
-        inSampleSize = scale
-        inJustDecodeBounds = false
-    }
-
-
-    val bitmap: Bitmap? =
-        BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
-
-
-    val fileName = "compressed_image_${System.currentTimeMillis()}.jpg"
-    val file = File(context.filesDir, fileName)
-    val outputStream = FileOutputStream(file)
-
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-    outputStream.flush()
-    outputStream.close()
-
-    return Uri.fromFile(file)
-}
-
-
-private fun calculateInSampleSize(
-    options: BitmapFactory.Options,
-
-    ): Int {
-    val reqWidth = 800
-    val reqHeight = 800
-    val height = options.outHeight
-    val width = options.outWidth
-    var inSampleSize = 1
-
-    if (height > reqHeight || width > reqWidth) {
-        val halfHeight = height / 2
-        val halfWidth = width / 2
-
-        while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
-            inSampleSize *= 2
+        return if (options.outWidth > options.outHeight) {
+            Configuration.ORIENTATION_LANDSCAPE
+        } else {
+            Configuration.ORIENTATION_PORTRAIT
         }
     }
 
-    return inSampleSize
-}
+    private fun compressImage(context: Context, imageUri: Uri): Uri? {
+        val quality = 40
+        val contentResolver = context.contentResolver
+        val inputStream: InputStream? = contentResolver.openInputStream(imageUri)
 
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+            BitmapFactory.decodeStream(inputStream, null, this)
+
+            val scale = calculateInSampleSize(this)
+            inSampleSize = scale
+            inJustDecodeBounds = false
+        }
+
+
+        val bitmap: Bitmap? =
+            BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
+
+
+        val fileName = "compressed_image_${System.currentTimeMillis()}.jpg"
+        val file = File(context.filesDir, fileName)
+        val outputStream = FileOutputStream(file)
+
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        outputStream.flush()
+        outputStream.close()
+
+        return Uri.fromFile(file)
+    }
+
+
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+
+        ): Int {
+        val reqWidth = 800
+        val reqHeight = 800
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+
+            while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
+    }
+}

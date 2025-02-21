@@ -28,7 +28,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.notesdata.NewsPostUi
 import com.example.notesdata.NotesViewModel
+import com.example.notesdata.PostUi
 
 @Composable
 fun NotesFeed(
@@ -55,130 +55,143 @@ fun NotesFeed(
     onNewsClicked: (NewsPostUi) -> Unit
 ) {
 
-
-
-    val posts by notesViewModel.allPosts.collectAsState()
-
-
+    val posts by notesViewModel.allPosts
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(posts) { item ->
-            var expanded by remember { mutableStateOf(false) }
 
-            val isFavorite = notesViewModel.favoritePosts[item.postId] ?: false
 
             LaunchedEffect(item.postId) {
                 notesViewModel.checkFavorite(item.postId)
             }
-            val fullText = item.content
-            val showMoreText = " Ещё"
-            val truncatedText = if (fullText.length > 100) fullText.take(110) + "..." else fullText
 
-            val annotatedString = buildAnnotatedString {
-                append(if (expanded) fullText else truncatedText)
-                if (!expanded && fullText.length > truncatedText.length) {
-                    withStyle(style = SpanStyle(color = Color.Blue)) {
-                        append(showMoreText)
-                    }
-                }
-            }
+            NotesCard(item, notesViewModel, onNewsClicked)
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                when (item.images.size) {
-                    1 -> {
-                        SingleImage(
-                            item.images[0],
-                            Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-                    }
-
-                    2 -> {
-                        TwoImages(
-                            item.images,
-                            Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-                    }
-
-                    else -> {
-                        Image(
-                            painter = painterResource(R.drawable.placeholder),
-                            contentDescription = "Placeholder",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-
-
-                Text(
-                    text = annotatedString,
-                    maxLines = if (expanded) Int.MAX_VALUE else 3,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable { expanded = !expanded }
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FavoriteButton(isFavorite) { notesViewModel.toggleFavorite(item.postId) }
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        items(item.tags) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(vertical = 10.dp, horizontal = 10.dp)
-                                    .height(25.dp)
-                                    .clip(RoundedCornerShape(50.dp))
-                                    .background(Color.LightGray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    modifier = Modifier.padding(horizontal = 10.dp),
-                                    text = it
-                                )
-                            }
-
-                        }
-
-
-                    }
-                }
-
-
-
-
-                if (item.news != null && item.news?.newsUrl != "null") {
-                    NewsTab(item.news, onNewsClicked)
-                }
-
-            }
         }
     }
 }
+@Composable
+fun NotesCard(
+    item: PostUi,
+    notesViewModel: NotesViewModel,
+    onNewsClicked: (NewsPostUi) -> Unit
+){
+    var expanded by remember { mutableStateOf(false) }
 
+    val isFavorite = notesViewModel.favoritePosts[item.postId] ?: false
+    val fullText = item.content
+    val showMoreText = " Ещё"
+    val truncatedText = if (fullText.length > 100) fullText.take(110) + "..." else fullText
+
+    val annotatedString = buildAnnotatedString {
+        append(if (expanded) fullText else truncatedText)
+        if (!expanded && fullText.length > truncatedText.length) {
+            withStyle(style = SpanStyle(color = Color.Blue)) {
+                append(showMoreText)
+            }
+        }
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        when (item.images.size) {
+            1 -> {
+                SingleImage(
+                    item.images[0],
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
+
+            2 -> {
+                TwoImages(
+                    item.images,
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
+
+            else -> {
+                Image(
+                    painter = painterResource(R.drawable.placeholder),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+
+        Text(
+            text = annotatedString,
+            maxLines = if (expanded) Int.MAX_VALUE else 3,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .padding(10.dp)
+                .clickable { expanded = !expanded }
+        )
+
+        FavoritesTagsRow(item, isFavorite, notesViewModel)
+
+
+
+        if (item.news != null && item.news?.newsUrl != "null") {
+            NewsTab(item.news, onNewsClicked)
+        }
+
+    }
+}
+@Composable
+fun FavoritesTagsRow(
+    item: PostUi,
+    isFavorite: Boolean,
+    notesViewModel: NotesViewModel
+){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FavoriteButton(isFavorite) { notesViewModel.toggleFavorite(item.postId) }
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(item.tags) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp, horizontal = 10.dp)
+                        .height(25.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(Color.LightGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        text = it
+                    )
+                }
+
+            }
+
+
+        }
+    }
+}
 @Composable
 fun SingleImage(uri: String, modifier: Modifier) {
     AsyncImage(
