@@ -33,7 +33,8 @@ import javax.inject.Inject
 class AddNoteViewModel @Inject constructor(
     application: Application,
     private val postDao: PostDao,
-    private val newsDao: NewsDao
+    private val newsDao: NewsDao,
+    private val notesViewModel: NotesViewModel
 ) : AndroidViewModel(application) {
     private val _selectedImage = MutableStateFlow<List<Uri>>(emptyList())
     val selectedImage: StateFlow<List<Uri>> get() = _selectedImage
@@ -79,6 +80,8 @@ class AddNoteViewModel @Inject constructor(
                 }
 
                 postDao.insertPostWithImagesAndTags(post, images, tags)
+
+                notesViewModel.getAllNotes()
             }
 
             clearData()

@@ -122,6 +122,7 @@ fun AddNoteScreen(
                 addNoteViewModel.saveNoteContent(noteContent)
                 addNoteViewModel.saveNote(context, news = news)
                 onBack()
+                notesViewModel.getAllNotes()
 
             },
             enabled = noteContent != " " && noteContent.isNotEmpty()

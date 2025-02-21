@@ -13,6 +13,10 @@ import com.example.notesdata.db.PostTagDao
 import com.example.notesdata.db.TagDao
 import com.example.notesdata.db.TagEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,11 +34,13 @@ class NotesViewModel @Inject constructor(
     val allTags: State<List<TagEntity>> = _allTags
 
 
-    private val _allPosts = mutableStateOf<List<PostUi>>(emptyList())
-    val allPosts: State<List<PostUi>> = _allPosts
+    private val _allPosts = MutableStateFlow<List<PostUi>>(emptyList())
+    val allPosts: StateFlow<List<PostUi>> = _allPosts
 
     private val _favoritePosts = mutableStateMapOf<Long, Boolean>()
     val favoritePosts: Map<Long, Boolean> get() = _favoritePosts
+
+
 
     fun getAllTags() {
         viewModelScope.launch {
@@ -59,7 +65,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun getAllNotes(){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val posts = mutableListOf<PostUi>()
             val allPost = postDao.getAllPosts()
             allPost.forEach{ post ->
@@ -70,7 +76,7 @@ class NotesViewModel @Inject constructor(
                 val news = if (post.newsId != null) newsDao.getNewsById(post.newsId) else null
              posts.add(postMapperUi(post =  post, image =  images, tags = allPostTag, news = news))
             }
-            _allPosts.value = posts
+            _allPosts.emit(posts)
         }
     }
 

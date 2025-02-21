@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,11 +54,12 @@ fun NotesFeed(
     notesViewModel: NotesViewModel,
     onNewsClicked: (NewsPostUi) -> Unit
 ) {
-    val posts by notesViewModel.allPosts
 
-    LaunchedEffect(posts) {
-        notesViewModel.getAllNotes()
-    }
+
+
+    val posts by notesViewModel.allPosts.collectAsState()
+
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -72,7 +74,7 @@ fun NotesFeed(
             }
             val fullText = item.content
             val showMoreText = " Ещё"
-            val truncatedText = if (fullText.length > 100) fullText.take(120) + "..." else fullText
+            val truncatedText = if (fullText.length > 100) fullText.take(110) + "..." else fullText
 
             val annotatedString = buildAnnotatedString {
                 append(if (expanded) fullText else truncatedText)
