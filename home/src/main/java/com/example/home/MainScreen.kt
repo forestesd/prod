@@ -3,6 +3,7 @@ package com.example.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,12 +20,10 @@ import androidx.compose.ui.unit.dp
 import com.example.apis.Article
 import com.example.apis.NewsViewModel
 import com.example.home.newsFeed.NewsFeedMain
-import com.example.home.newsFeed.ProgressBar
 import com.example.home.search.SearchScreen
 import com.example.home.shimmer.NewsShimmerListItem
 import com.example.home.shimmer.TickersShimmer
 import com.example.home.tickers.TickersFeedMain
-import com.example.home.tickers.TickersProgressBar
 import com.example.tickersapi.TickersViewModel
 
 @Composable
@@ -50,32 +49,52 @@ fun MainScreen(
         horizontalAlignment = Alignment.Start
     ) {
 
-        SearchScreen(newsViewModel,tickersViewModel)
+        SearchScreen(newsViewModel, tickersViewModel)
 
         HorizontalDivider(modifier = Modifier.padding(10.dp))
 
 
-
-
         if (tickersViewModel.isLoading.value) {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(bottom = 10.dp, start = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                items(10){
-                    TickersShimmer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
+            if (!tickersViewModel.isSearching.value) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .padding(bottom = 10.dp, start = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    items(10) {
+                        TickersShimmer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            tickersViewModel.isSearching.value
+                        )
+                    }
+                }
+            }else{
+                LazyColumn (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.35f)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 10.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(10) {
+                        TickersShimmer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            tickersViewModel.isSearching.value
+                        )
+                    }
                 }
             }
 
         } else {
-            TickersFeedMain(tickers,tickersViewModel)
+            TickersFeedMain(tickers, tickersViewModel)
         }
 
         if (newsViewModel.isLoading.value) {
@@ -84,8 +103,8 @@ fun MainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(16.dp),
-            ){
-                items(10){
+            ) {
+                items(10) {
                     NewsShimmerListItem(
                         modifier = Modifier
                             .fillMaxWidth()

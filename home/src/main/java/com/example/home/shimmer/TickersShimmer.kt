@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TickersShimmer (
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSearching: Boolean
 ){
     Card(
         modifier = Modifier
             .wrapContentWidth()
             .height(80.dp)
-            .padding(end = 10.dp),
+            .padding(end = 10.dp, bottom = if(isSearching) 5.dp else 0.dp),
     ){
         Row(
             modifier = modifier,
@@ -34,8 +35,8 @@ fun TickersShimmer (
         ) {
             Box(
                 modifier = Modifier
-                    .padding(start = 5.dp)
                     .size(45.dp)
+                    .padding(start = 5.dp)
                     .clip(CircleShape)
                     .shimmerEffect()
             )
