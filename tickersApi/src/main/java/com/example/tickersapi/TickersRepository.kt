@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 import retrofit2.HttpException
 import java.io.InputStreamReader
@@ -33,13 +34,22 @@ class TickersRepository @Inject constructor(
 
     suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
         val tickersUi = mutableListOf<TickerUi>()
+        var retryCount = 0
 
         coroutineScope {
             val jobs = tickers.map { symbol ->
                 async(Dispatchers.IO) {
-                    val companyProfile = api.getCompanyInfo(symbol,apiKey)
-                    val stockQuote = api.getInfoTicker(symbol, apiKey)
-                    tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
+                    while (retryCount < 4) {
+                        try {
+                            val companyProfile = api.getCompanyInfo(symbol, apiKey)
+                            val stockQuote = api.getInfoTicker(symbol, apiKey)
+                            tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
+                            break
+                        } catch (_: HttpException) {
+                            retryCount ++
+                            delay(2000)
+                        }
+                    }
                 }
             }
             jobs.awaitAll()
@@ -50,25 +60,27 @@ class TickersRepository @Inject constructor(
 
     suspend fun searchCompany(apiKey: String, q: String, exchange: String): List<TickerUi> {
         val tickerUi = mutableListOf<TickerUi>()
+        var retryCount = 0
         coroutineScope {
             val companiesSearch = api.searchCompany(q, exchange, apiKey)
             val jobs = companiesSearch.result.distinctBy {it.symbol}.take(10).map { item ->
                 async(Dispatchers.IO) {
-                    try {
-                        val companyProfile = api.getCompanyInfo(item.symbol,apiKey)
-                        val companyTicker = api.getInfoTicker(item.symbol, apiKey)
-                        val mappedTicker = tickersUiMapper(companyProfile,companyTicker)
-                        synchronized(tickerUi) {
-                            if (!tickerUi.contains(mappedTicker)) {
-                                tickerUi.add(mappedTicker)
+                    while (retryCount <4) {
+                        try {
+                            val companyProfile = api.getCompanyInfo(item.symbol, apiKey)
+                            val companyTicker = api.getInfoTicker(item.symbol, apiKey)
+                            val mappedTicker = tickersUiMapper(companyProfile, companyTicker)
+                            synchronized(tickerUi) {
+                                if (!tickerUi.contains(mappedTicker)) {
+                                    tickerUi.add(mappedTicker)
+                                }
                             }
+                            break
+                        } catch (_: HttpException) {
+                            retryCount++
+                            delay(2000)
                         }
-                    }catch (_:HttpException){
-
                     }
-
-
-
                 }
             }
             jobs.awaitAll()
