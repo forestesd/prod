@@ -3,7 +3,6 @@ package com.example.home.tickers
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,9 +32,9 @@ import com.example.tickersapi.TickersViewModel
 @Composable
 fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel) {
 
-    if (tickersViewModel.isSearching.value) {
+    if (tickersViewModel.isSearching.value && tickers.isNotEmpty()) {
         SearchTickersFeed(tickers)
-    } else {
+    } else if (!tickersViewModel.isSearching.value){
         MainTickersFeed(tickers)
     }
 
@@ -61,10 +60,15 @@ fun MainTickersFeed(tickers: List<TickerUi>) {
 
 @Composable
 fun SearchTickersFeed(tickers: List<TickerUi>) {
+
+    val cardHeight = 80.dp
+    val visibleCards = 3
+    val totalHeight = cardHeight * visibleCards
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.35f)
+            .height(totalHeight)
             .padding(horizontal = 16.dp)
             .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Top,

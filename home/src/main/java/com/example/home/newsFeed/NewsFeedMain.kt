@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.apis.Article
-import com.example.apis.Docs
 import com.example.apis.NewsViewModel
 import com.example.home.PxToDp
 import com.example.home.R
@@ -47,7 +46,7 @@ fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel, onCardClicked: (
                 item, viewModel
             ) {
                 onCardClicked(
-                     item
+                    item
                 )
             }
 

@@ -66,6 +66,19 @@ class NewsViewModel @Inject constructor(
         }
     }
 
+    fun loadNewsPullToRefresh() {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            val newsList =
+                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+            _news.value = validateNews(newsList)
+
+            _isLoading.value = false
+
+        }
+    }
+
     fun loadSearchNews(q: String) {
         if (q.length >= 2) {
             viewModelScope.launch {
