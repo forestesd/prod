@@ -7,17 +7,22 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import okhttp3.OkHttpClient
 import org.json.JSONArray
 import retrofit2.HttpException
 import java.io.InputStreamReader
-
 import javax.inject.Inject
 
 class TickersRepository @Inject constructor(
     private val context: Context,
-    private val api: TickersApiService
-) {
+    private val api: TickersApiService,
+    client: OkHttpClient,
+    apiUrl: String,
+    ) {
     private val tickers = loadTickersFromJSON()
+    private val webSocket = TickersWebSocket(client, apiUrl)
+
+
 
     private fun loadTickersFromJSON(): List<String> {
         val jsonFile = context.resources.openRawResource(R.raw.tickers)
@@ -35,7 +40,9 @@ class TickersRepository @Inject constructor(
     suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
         val tickersUi = mutableListOf<TickerUi>()
         var retryCount = 0
-
+        if (!webSocket.isConnected) {
+            webSocket.connect()
+        }
         coroutineScope {
             val jobs = tickers.map { symbol ->
                 async(Dispatchers.IO) {
@@ -44,6 +51,8 @@ class TickersRepository @Inject constructor(
                             val companyProfile = api.getCompanyInfo(symbol, apiKey)
                             val stockQuote = api.getInfoTicker(symbol, apiKey)
                             tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
+
+                            webSocket.subscribeToTicker(symbol)
                             break
                         } catch (_: HttpException) {
                             retryCount ++

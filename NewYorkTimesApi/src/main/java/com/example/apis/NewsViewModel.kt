@@ -49,19 +49,14 @@ class NewsViewModel @Inject constructor(
 
     fun loadNews() {
         viewModelScope.launch {
-            if (_news.value.isEmpty()) {
-                _isLoading.value = true
+            _isLoading.value = true
 
-                val newsList =
-                    repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
-                _news.value = validateNews(newsList)
+            val newsList =
+                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+            _news.value = validateNews(newsList)
 
-                _isLoading.value = false
-            } else {
-                val newsList = repository.getCachedNews()
-                _news.value = validateNews(newsList)
-                _isLoading.value = false
-            }
+            _isLoading.value = false
+
 
         }
     }
@@ -71,7 +66,7 @@ class NewsViewModel @Inject constructor(
             _isLoading.value = true
 
             val newsList =
-                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                repository.getNewsPullToRefresh("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
             _news.value = validateNews(newsList)
 
             _isLoading.value = false

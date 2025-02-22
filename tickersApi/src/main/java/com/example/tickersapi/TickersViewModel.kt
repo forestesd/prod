@@ -8,7 +8,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TickersViewModel @Inject constructor(
-    private val repository: TickersRepository
+    private val repository: TickersRepository,
+
 ): ViewModel() {
     private val _tickers = mutableStateOf<List<TickerUi>>(emptyList())
     val tickers: State<List<TickerUi>> = _tickers

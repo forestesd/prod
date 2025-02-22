@@ -11,10 +11,8 @@ fun tickersUiMapper(companyProfileResponse: CompanyProfileResponse, stockQuote: 
     val symbols = DecimalFormatSymbols(Locale.US).apply {
         decimalSeparator = '.'
     }
-    val priceChanges = stockQuote.c - stockQuote.pc
-    val priceChangePercent = (priceChanges/stockQuote.c)*100
 
-    val isUp = priceChanges>0
+    val isUp = stockQuote.d>0
     val priceColor = if (isUp) Color(0xFF1BBE31) else Color.Red
 
     return TickerUi(
@@ -22,7 +20,7 @@ fun tickersUiMapper(companyProfileResponse: CompanyProfileResponse, stockQuote: 
         symbol =  companyProfileResponse.ticker.toString(),
         logoUrl = companyProfileResponse.logo.toString(),
         price = DecimalFormat("#.########", symbols).format(stockQuote.c),
-        priceChangePercent = (round(priceChangePercent*100)/100).toString(),
+        priceChangePercent = (round(stockQuote.dp*100)/100).toString(),
         isUp =  isUp,
         priceColor = priceColor
     )

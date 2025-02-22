@@ -61,7 +61,7 @@ fun MainTickersFeed(tickers: List<TickerUi>) {
 @Composable
 fun SearchTickersFeed(tickers: List<TickerUi>) {
 
-    val cardHeight = 80.dp
+    val cardHeight = 82.dp
     val visibleCards = 3
     val totalHeight = cardHeight * visibleCards
 

@@ -26,6 +26,7 @@ import com.example.tickersapi.TickersViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import okhttp3.OkHttpClient
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -74,8 +75,25 @@ class TickersApiModel {
 
     @Provides
     @Singleton
-    fun provideTickersRepository(api: TickersApiService, context: Context): TickersRepository {
-        return TickersRepository(context, api)
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiUrl(): String {
+        return "wss://ws.finnhub.io"
+    }
+
+    @Provides
+    @Singleton
+    fun provideTickersRepository(
+        api: TickersApiService,
+        context: Context,
+        client: OkHttpClient,
+        apiUrl: String
+    ): TickersRepository {
+        return TickersRepository(context, api, client, apiUrl)
     }
 
     @Provides
@@ -97,63 +115,69 @@ class AppModule(private val application: Application) {
 }
 
 @Module
-class DataBaseFinanceModule{
+class DataBaseFinanceModule {
 
     @Provides
     @Singleton
-    fun provideGoalDAO(financeDb: FinanceDB): GoalDAO{
+    fun provideGoalDAO(financeDb: FinanceDB): GoalDAO {
         return financeDb.goalDao()
     }
 
     @Provides
     @Singleton
-    fun provideTransactionDao(financeDb: FinanceDB): TransactionDao{
+    fun provideTransactionDao(financeDb: FinanceDB): TransactionDao {
         return financeDb.transactionDao()
     }
+
     @Provides
     @Singleton
-    fun provideFinanceDb(context: Context): FinanceDB{
+    fun provideFinanceDb(context: Context): FinanceDB {
         return FinanceDB.getDB(context)
     }
 }
 
 
 @Module
-class PostDatabaseModile{
+class PostDatabaseModile {
 
     @Provides
     @Singleton
     fun providePostDatabase(context: Context): PostDatabase {
         return PostDatabase.getDB(context)
     }
+
     @Provides
     @Singleton
     fun providePostDao(postDatabase: PostDatabase): PostDao {
         return postDatabase.postDao()
     }
+
     @Provides
     @Singleton
     fun providePostImageDao(postDatabase: PostDatabase): PostImageDao {
         return postDatabase.postImageDao()
     }
+
     @Provides
     @Singleton
     fun provideTagDao(postDatabase: PostDatabase): TagDao {
         return postDatabase.tagDao()
     }
+
     @Provides
     @Singleton
     fun providePostTagDao(postDatabase: PostDatabase): PostTagDao {
         return postDatabase.postTagDao()
     }
+
     @Provides
     @Singleton
-    fun provideNewsDao(postDatabase: PostDatabase): NewsDao{
+    fun provideNewsDao(postDatabase: PostDatabase): NewsDao {
         return postDatabase.newsDao()
     }
 }
 
-@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class , PostDatabaseModile::class, AppModule::class])
+@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class, PostDatabaseModile::class, AppModule::class])
 @Singleton
 interface AppComponent {
     fun inject(activity: MainActivity)

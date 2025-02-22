@@ -3,7 +3,6 @@ package com.example.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -107,10 +106,13 @@ fun MainScreen(
                         }
                     }
                 } else {
+                    val cardHeight = 82.dp
+                    val visibleCards = 3
+                    val totalHeight = cardHeight * visibleCards
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.35f)
+                            .height(totalHeight)
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 10.dp),
                         verticalArrangement = Arrangement.Top,
