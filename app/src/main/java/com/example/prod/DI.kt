@@ -82,7 +82,7 @@ class TickersApiModel {
     @Provides
     @Singleton
     fun provideApiUrl(): String {
-        return "wss://ws.finnhub.io"
+        return "wss://ws.finnhub.io?"
     }
 
     @Provides

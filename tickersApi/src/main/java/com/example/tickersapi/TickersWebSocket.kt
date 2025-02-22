@@ -30,7 +30,7 @@ class TickersWebSocket(
         if (isConnected) return
 
         val request = Request.Builder()
-            .url("$apiUrl?token=cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
+            .url("${apiUrl}token=cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
             .build()
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -43,6 +43,7 @@ class TickersWebSocket(
                 Log.i("WEBSOCKET", "Received message: $text")
                 val update = parseStockQuote(text)
                 _tickerUpdates.tryEmit(update)
+
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -80,7 +81,7 @@ class TickersWebSocket(
 
     fun subscribeToTicker(symbol: String) {
         if (!isConnected) return
-        val message = "{\"type\": \"subscribe\", \"symbol\": \"$symbol\"}"
+        val message = """{"type":"subscribe","symbol":"$symbol"}"""
         webSocket?.send(message)
         Log.i("WEBSOCKET", "Subscribed to $symbol")
     }
