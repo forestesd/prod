@@ -63,12 +63,12 @@ class TickersRepository @Inject constructor(
 
     suspend fun searchCompany(apiKey: String, q: String, exchange: String): List<TickerUi> {
         val tickerUi = mutableListOf<TickerUi>()
-        var retryCount = 0
+
         coroutineScope {
             val companiesSearch = api.searchCompany(q, exchange, apiKey)
             val jobs = companiesSearch.result.distinctBy { it.symbol }.map { item ->
                 async(Dispatchers.IO) {
-                    while (retryCount < 4) {
+                    while (true) {
                         try {
                             val companyProfile = api.getCompanyInfo(item.symbol, apiKey)
                             val companyTicker = api.getInfoTicker(item.symbol, apiKey)
@@ -79,9 +79,8 @@ class TickersRepository @Inject constructor(
                                 }
                             }
                             break
-                        } catch (_: HttpException) {
-                            retryCount++
-                            delay(2000)
+                        } catch (_: HttpException){
+
                         }
                     }
                 }

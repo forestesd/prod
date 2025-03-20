@@ -2,7 +2,6 @@ package com.example.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.apis.domain.models.Article
 import com.example.apis.data.NewsViewModel
-import com.example.home.newsFeed.NewsFeedMain
+import com.example.home.newsFeed.NewsCard
 import com.example.home.search.SearchScreen
 import com.example.home.shimmer.NewsShimmerListItem
 import com.example.home.shimmer.TickersShimmer
@@ -89,14 +88,10 @@ fun MainScreen(
         ) {
             item {
                 SearchScreen(newsViewModel, tickersViewModel)
-
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-
             }
 
             item {
-
-
                 if (tickersLoading) {
                     if (!isSearchingTickers) {
                         LazyRow(
@@ -144,30 +139,26 @@ fun MainScreen(
                 }
             }
 
-            item {
-                if (newsLoading) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        repeat(10) {
-                            NewsShimmerListItem(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            )
-                        }
-                    }
 
-                } else {
-                    NewsFeedMain(
-                        if (isSearchingNews) serchNews else news,
-                        newsViewModel,
-                        onCardClicked
+            if (newsLoading) {
+
+                items(10) {
+                    NewsShimmerListItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     )
+                }
+
+            } else {
+                items(if (isSearchingNews) serchNews else news, key = { item -> item.title }) { item ->
+                    NewsCard(
+                        item, newsViewModel
+                    ) {
+                        onCardClicked(
+                            item
+                        )
+                    }
                 }
             }
 

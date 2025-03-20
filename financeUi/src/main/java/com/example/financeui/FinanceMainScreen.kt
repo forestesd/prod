@@ -1,13 +1,13 @@
 package com.example.financeui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
@@ -38,60 +38,71 @@ fun FinanceMainScreen(financeViewModel: FinanceViewModel) {
         financeViewModel.getTransactions()
         financeViewModel.allAmount()
     }
-    Column(
+    LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            text = "Финансы",
-            fontSize = 34.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 10.dp, top = 16.dp)
-        )
-        HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-        SavingsWidget(financeViewModel)
-        GoalsFrame(financeViewModel)
+        item {
+            Text(
+                text = "Финансы",
+                fontSize = 34.sp,
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 16.dp)
+            )
+            HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+            SavingsWidget(financeViewModel)
+        }
+
+        item {
+            GoalsFrame(financeViewModel)
+        }
 
 
-        AddButtons(text = "Добавить цель", enabled = true, onClick = { showGoalsDialog = true })
+        item {
+            AddButtons(text = "Добавить цель", enabled = true, onClick = { showGoalsDialog = true })
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                thickness = 10.dp,
+                color = Color.LightGray
+            )
+        }
 
-        AddGoalOrTransactionDialog(
-            financeViewModel.goalsWithProgress.value,
-            dialogType = "goal",
-            showGoalsDialog,
-            onBack = { showGoalsDialog = false },
-            onAddGoal = { name, amount, date ->
-                financeViewModel.addGoal(name, amount, date)
-                showGoalsDialog = false
-            },
-            addTransaction = { _, _, _, _ -> }
-        )
-
-        HorizontalDivider(
-            modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 10.dp)
-                .height(10.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            thickness = 10.dp,
-            color = Color.LightGray
-        )
+        item {
+            AddGoalOrTransactionDialog(
+                financeViewModel.goalsWithProgress.value,
+                dialogType = "goal",
+                showGoalsDialog,
+                onBack = { showGoalsDialog = false },
+                onAddGoal = { name, amount, date ->
+                    financeViewModel.addGoal(name, amount, date)
+                    showGoalsDialog = false
+                },
+                addTransaction = { _, _, _, _ -> }
+            )
 
 
-        AddGoalOrTransactionDialog(
-            financeViewModel.goalsWithProgress.value,
-            dialogType = "transaction",
-            showTransactionDialog,
-            onBack = { showTransactionDialog = false },
-            onAddGoal = { _, _, _ -> },
-            addTransaction = { goalName, sum, typeTransaction, comment ->
-                financeViewModel.addTransaction(goalName, sum, typeTransaction, comment)
-                showTransactionDialog = false
-            }
-        )
 
-        TransactionFrame(financeViewModel, onClickAddButton = { showTransactionDialog = true })
+
+            AddGoalOrTransactionDialog(
+                financeViewModel.goalsWithProgress.value,
+                dialogType = "transaction",
+                showTransactionDialog,
+                onBack = { showTransactionDialog = false },
+                onAddGoal = { _, _, _ -> },
+                addTransaction = { goalName, sum, typeTransaction, comment ->
+                    financeViewModel.addTransaction(goalName, sum, typeTransaction, comment)
+                    showTransactionDialog = false
+                }
+            )
+        }
+
+        item {
+            TransactionFrame(financeViewModel, onClickAddButton = { showTransactionDialog = true })
+        }
 
     }
 }

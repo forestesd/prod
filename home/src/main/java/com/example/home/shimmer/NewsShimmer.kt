@@ -23,11 +23,14 @@ import com.example.home.PxToDp
 fun NewsShimmerListItem(
     modifier: Modifier = Modifier
 ) {
-    Card {
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
         Row(modifier = modifier) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+
             ) {
                 Box(
                     modifier = Modifier
