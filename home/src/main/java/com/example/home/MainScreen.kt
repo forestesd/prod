@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -41,7 +42,6 @@ fun MainScreen(
     newsViewModel: NewsViewModel,
     onCardClicked: (Article) -> Unit,
     tickersViewModel: TickersViewModel
-
 ) {
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -82,90 +82,98 @@ fun MainScreen(
         onRefresh = onRefresh,
         isRefreshing = isRefreshing
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+            item {
+                SearchScreen(newsViewModel, tickersViewModel)
 
-            SearchScreen(newsViewModel, tickersViewModel)
+                HorizontalDivider(modifier = Modifier.padding(10.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(10.dp))
-
-
-            if (tickersLoading) {
-                if (!isSearchingTickers) {
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                            .padding(bottom = 10.dp, start = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        items(10) {
-                            TickersShimmer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                isSearchingTickers
-                            )
-                        }
-                    }
-                } else {
-                    val cardHeight = 82.dp
-                    val visibleCards = 3
-                    val totalHeight = cardHeight * visibleCards
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(totalHeight)
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 10.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        items(10) {
-                            TickersShimmer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                               isSearchingTickers
-                            )
-                        }
-                    }
-                }
-
-            } else {
-                TickersFeedMain(tickers, tickersViewModel)
             }
 
-            if (newsLoading) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(16.dp),
-                ) {
-                    items(10) {
-                        NewsShimmerListItem(
+            item {
+
+
+                if (tickersLoading) {
+                    if (!isSearchingTickers) {
+                        LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                        )
+                                .height(80.dp)
+                                .padding(bottom = 10.dp, start = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            items(10) {
+                                TickersShimmer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    isSearchingTickers
+                                )
+                            }
+                        }
+                    } else {
+                        val cardHeight = 82.dp
+                        val visibleCards = 3
+                        val totalHeight = cardHeight * visibleCards
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(totalHeight)
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 10.dp),
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            repeat(10) {
+                                TickersShimmer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    isSearchingTickers
+                                )
+                            }
+                        }
                     }
-                }
 
-            } else {
-                NewsFeedMain(
-                    if (isSearchingNews) serchNews else news,
-                    newsViewModel,
-                    onCardClicked
-                )
+                } else {
+                    TickersFeedMain(tickers, tickersViewModel)
+                }
             }
+
+            item {
+                if (newsLoading) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        repeat(10) {
+                            NewsShimmerListItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+
+                } else {
+                    NewsFeedMain(
+                        if (isSearchingNews) serchNews else news,
+                        newsViewModel,
+                        onCardClicked
+                    )
+                }
+            }
+
 
         }
     }
-
 
 
 }

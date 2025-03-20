@@ -34,26 +34,20 @@ import com.example.home.R
 
 @Composable
 fun NewsFeedMain(news: List<Article>, viewModel: NewsViewModel, onCardClicked: (Article) -> Unit) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(16.dp),
-
-        ) {
-        items(news, key = { item -> item.title }) { item ->
+    ) {
+        news.forEach { item ->
             NewsCrad(
                 item, viewModel
             ) {
-                onCardClicked(
-                    item
-                )
+                onCardClicked(item)
             }
-
         }
     }
 }
-
 @Composable
 fun NewsCrad(item: Article, viewModel: NewsViewModel, onCardClicked: (String) -> Unit) {
     val imageUrl = viewModel.getImageUrlForArticle(item)
