@@ -18,10 +18,9 @@ class TickersRepository @Inject constructor(
     private val api: TickersApiService,
     client: OkHttpClient,
     apiUrl: String,
-    ) {
+) {
     private val tickers = loadTickersFromJSON()
     private val webSocket = TickersWebSocket(client, apiUrl)
-
 
 
     private fun loadTickersFromJSON(): List<String> {
@@ -39,24 +38,19 @@ class TickersRepository @Inject constructor(
 
     suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
         val tickersUi = mutableListOf<TickerUi>()
-        var retryCount = 0
-        if (!webSocket.isConnected) {
-            webSocket.connect()
-        }
+
         coroutineScope {
             val jobs = tickers.map { symbol ->
                 async(Dispatchers.IO) {
-                    while (retryCount < 4) {
+                    while (true) {
                         try {
                             val companyProfile = api.getCompanyInfo(symbol, apiKey)
                             val stockQuote = api.getInfoTicker(symbol, apiKey)
                             tickersUi.add(tickersUiMapper(companyProfile, stockQuote))
 
-                            webSocket.subscribeToTicker(symbol)
                             break
                         } catch (_: HttpException) {
-                            retryCount ++
-                            delay(2000)
+
                         }
                     }
                 }
@@ -72,9 +66,9 @@ class TickersRepository @Inject constructor(
         var retryCount = 0
         coroutineScope {
             val companiesSearch = api.searchCompany(q, exchange, apiKey)
-            val jobs = companiesSearch.result.distinctBy {it.symbol}.take(10).map { item ->
+            val jobs = companiesSearch.result.distinctBy { it.symbol }.map { item ->
                 async(Dispatchers.IO) {
-                    while (retryCount <4) {
+                    while (retryCount < 4) {
                         try {
                             val companyProfile = api.getCompanyInfo(item.symbol, apiKey)
                             val companyTicker = api.getInfoTicker(item.symbol, apiKey)
@@ -94,8 +88,30 @@ class TickersRepository @Inject constructor(
             }
             jobs.awaitAll()
         }
-        return tickerUi.filter { it.name != "null" && it.price.toDouble() != 0.0}.distinctBy { it.symbol }
+        return tickerUi.filter { it.name != "null" && it.price.toDouble() != 0.0 }
+            .distinctBy { it.symbol }
 
     }
 
+    suspend fun webSocketOpen() {
+        if (!webSocket.isConnected) {
+            webSocket.connect()
+        }
+        coroutineScope {
+            val jobs = tickers.map { symbol ->
+                async(Dispatchers.IO) {
+                    while (true) {
+                        try {
+                            webSocket.subscribeToTicker(symbol)
+                            break
+                        } catch (_: HttpException) {
+
+                        }
+                    }
+                }
+
+            }
+            jobs.awaitAll()
+        }
+    }
 }

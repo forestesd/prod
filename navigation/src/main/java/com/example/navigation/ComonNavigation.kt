@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.apis.NewsViewModel
+import com.example.apis.data.NewsViewModel
 import com.example.financedate.FinanceViewModel
 import com.example.financeui.FinanceMainScreen
 import com.example.home.MainScreen

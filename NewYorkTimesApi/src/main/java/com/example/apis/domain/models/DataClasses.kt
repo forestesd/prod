@@ -1,11 +1,11 @@
-package com.example.apis
+package com.example.apis.domain.models
 
 
 data class TimesResponse(
     val status: String,
     val results: List<Article>,
 
-)
+    )
 
 data class Article(
     val title: String,
@@ -25,7 +25,7 @@ data class Image(
 
 data class SearchTimesResponse(
     val status: String,
-    val response:ResponseDetails
+    val response: ResponseDetails
 )
 
 data class ResponseDetails(

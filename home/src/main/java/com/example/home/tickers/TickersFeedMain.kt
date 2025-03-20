@@ -17,6 +17,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,9 +34,11 @@ import com.example.tickersapi.TickersViewModel
 @Composable
 fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel) {
 
-    if (tickersViewModel.isSearching.value && tickers.isNotEmpty()) {
+    val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
+
+    if (isSearchingTickers && tickers.isNotEmpty()) {
         SearchTickersFeed(tickers)
-    } else if (!tickersViewModel.isSearching.value){
+    } else if (!isSearchingTickers) {
         MainTickersFeed(tickers)
     }
 

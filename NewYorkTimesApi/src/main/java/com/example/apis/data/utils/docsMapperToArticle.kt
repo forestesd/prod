@@ -1,5 +1,8 @@
-package com.example.apis
+package com.example.apis.data.utils
 
+import com.example.apis.domain.models.Article
+import com.example.apis.domain.models.Docs
+import com.example.apis.domain.models.Image
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

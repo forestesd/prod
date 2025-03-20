@@ -1,5 +1,7 @@
-package com.example.apis
+package com.example.apis.data
 
+import com.example.apis.domain.models.SearchTimesResponse
+import com.example.apis.domain.models.TimesResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

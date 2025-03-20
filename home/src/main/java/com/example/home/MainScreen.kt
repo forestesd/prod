@@ -15,6 +15,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,8 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.apis.Article
-import com.example.apis.NewsViewModel
+import com.example.apis.domain.models.Article
+import com.example.apis.data.NewsViewModel
 import com.example.home.newsFeed.NewsFeedMain
 import com.example.home.search.SearchScreen
 import com.example.home.shimmer.NewsShimmerListItem
@@ -52,21 +53,26 @@ fun MainScreen(
     }
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
-            isRefreshing = true
             newsViewModel.loadNewsPullToRefresh()
             tickersViewModel.loadTickers()
-
         }
 
     }
-    LaunchedEffect(newsViewModel.news.value, tickersViewModel.tickers.value) {
-        isRefreshing = false
+    val tickersLoading by tickersViewModel.isLoading.collectAsState()
+    val newsLoading by newsViewModel.isLoading.collectAsState()
+    val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
+    val isSearchingNews by newsViewModel.isSearching.collectAsState()
+
+
+    val isLoading = newsLoading || tickersLoading
+    LaunchedEffect(isLoading) {
+        isRefreshing = isLoading
     }
 
 
-    val news by newsViewModel.news
-    val serchNews by newsViewModel.searchNews
-    val tickers by tickersViewModel.tickers
+    val news by newsViewModel.news.collectAsState()
+    val serchNews by newsViewModel.searchNews.collectAsState()
+    val tickers by tickersViewModel.tickers.collectAsState()
 
 
 
@@ -87,8 +93,8 @@ fun MainScreen(
             HorizontalDivider(modifier = Modifier.padding(10.dp))
 
 
-            if (tickersViewModel.isLoading.value) {
-                if (!tickersViewModel.isSearching.value) {
+            if (tickersLoading) {
+                if (!isSearchingTickers) {
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -101,7 +107,7 @@ fun MainScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                tickersViewModel.isSearching.value
+                                isSearchingTickers
                             )
                         }
                     }
@@ -123,7 +129,7 @@ fun MainScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                tickersViewModel.isSearching.value
+                               isSearchingTickers
                             )
                         }
                     }
@@ -133,7 +139,7 @@ fun MainScreen(
                 TickersFeedMain(tickers, tickersViewModel)
             }
 
-            if (newsViewModel.isLoading.value) {
+            if (newsLoading) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,7 +157,7 @@ fun MainScreen(
 
             } else {
                 NewsFeedMain(
-                    if (newsViewModel.isSearching.value) serchNews else news,
+                    if (isSearchingNews) serchNews else news,
                     newsViewModel,
                     onCardClicked
                 )

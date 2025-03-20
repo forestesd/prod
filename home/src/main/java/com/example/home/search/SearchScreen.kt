@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +31,7 @@ import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.apis.NewsViewModel
+import com.example.apis.data.NewsViewModel
 import com.example.tickersapi.TickersViewModel
 import kotlinx.coroutines.delay
 
@@ -40,7 +41,8 @@ import kotlinx.coroutines.delay
 fun SearchScreen(newsViewModel: NewsViewModel, tickersViewModel: TickersViewModel) {
     var query by remember { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
-    if (!newsViewModel.isSearching.value){
+    val isSearching by newsViewModel.isSearching.collectAsState()
+    if (!isSearching){
         Text(
             text = "Главная",
             modifier = Modifier.padding(start = 10.dp, top = 16.dp),

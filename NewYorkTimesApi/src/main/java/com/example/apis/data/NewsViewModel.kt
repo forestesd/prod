@@ -1,9 +1,16 @@
-package com.example.apis
+package com.example.apis.data
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.apis.data.repository.NewsRepository
+import com.example.apis.data.utils.docsMapperToArticle
+import com.example.apis.domain.models.Article
+import com.example.apis.domain.models.Docs
+import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
+import com.example.apis.domain.use_cases.GetNewsUseCase
+import com.example.apis.domain.use_cases.GetSearchNewsUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -11,19 +18,21 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class NewsViewModel @Inject constructor(
-    private val repository: NewsRepository,
+    private val getNewsUseCase: GetNewsUseCase,
+    private val getNewsPullToRefreshUseCase: GetNewsPullToRefreshUseCase,
+    private val getSearchNewsUseCase: GetSearchNewsUseCase
 ) : ViewModel() {
-    private val _news = mutableStateOf<List<Article>>(emptyList())
-    val news: State<List<Article>> = _news
+    private val _news = MutableStateFlow<List<Article>>(emptyList())
+    val news: StateFlow<List<Article>> = _news
 
-    private var _isLoading = mutableStateOf(true)
-    val isLoading: State<Boolean> = _isLoading
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private var _searchNews = mutableStateOf<List<Article>>(emptyList())
-    val searchNews: State<List<Article>> = _searchNews
+    private var _searchNews = MutableStateFlow<List<Article>>(emptyList())
+    val searchNews: StateFlow<List<Article>> = _searchNews
 
-    private var _isSearching = mutableStateOf(false)
-    val isSearching: State<Boolean> = _isSearching
+    private var _isSearching = MutableStateFlow(false)
+    val isSearching: StateFlow<Boolean> = _isSearching
 
 
     private fun validateNews(newsList: List<Article>): List<Article> {
@@ -52,7 +61,7 @@ class NewsViewModel @Inject constructor(
             _isLoading.value = true
 
             val newsList =
-                repository.getNews("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                getNewsUseCase.invoke("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
             _news.value = validateNews(newsList)
 
             _isLoading.value = false
@@ -66,7 +75,11 @@ class NewsViewModel @Inject constructor(
             _isLoading.value = true
 
             val newsList =
-                repository.getNewsPullToRefresh("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                getNewsPullToRefreshUseCase.invoke(
+                    "nyt",
+                    "world",
+                    "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg"
+                )
             _news.value = validateNews(newsList)
 
             _isLoading.value = false
@@ -78,7 +91,7 @@ class NewsViewModel @Inject constructor(
         if (q.length >= 2) {
             viewModelScope.launch {
                 _isLoading.value = true
-                val newsList = repository.getSearchNews(q, "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                val newsList = getSearchNewsUseCase.invoke(q, "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
                     .sortedByDescending {
                         try {
                             val formattedDate = it.pub_date.replaceFirst(

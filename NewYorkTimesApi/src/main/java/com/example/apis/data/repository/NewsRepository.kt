@@ -1,6 +1,10 @@
-package com.example.apis
+package com.example.apis.data.repository
 
 import androidx.compose.runtime.mutableStateOf
+import com.example.apis.data.TimesApiService
+import com.example.apis.domain.models.Article
+import com.example.apis.domain.models.Docs
+import com.example.apis.domain.repository.NewsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -9,13 +13,13 @@ import javax.inject.Named
 
 class NewsRepository @Inject constructor(
     @Named("newsApi") val timesApiService: TimesApiService,
-    @Named("searchApi") val  searchApiService: TimesApiService
-) {
+    @Named("searchApi") val searchApiService: TimesApiService
+) : NewsRepository {
     private var cachedNews = mutableStateOf<List<Article>>(emptyList())
     private var lastUpdateTime = 0L
     private val cacheDuration = 6 * 60 * 60 * 1000L
 
-    suspend fun getNews(source: String, section: String, apiKey: String): List<Article> {
+    override suspend fun getNews(source: String, section: String, apiKey: String): List<Article> {
         val currentTime = System.currentTimeMillis()
 
         if ((currentTime - lastUpdateTime) < cacheDuration && cachedNews.value.isNotEmpty()) {
@@ -37,7 +41,11 @@ class NewsRepository @Inject constructor(
         }
     }
 
-    suspend fun getNewsPullToRefresh(source: String, section: String, apiKey: String): List<Article>{
+    override suspend fun getNewsPullToRefresh(
+        source: String,
+        section: String,
+        apiKey: String
+    ): List<Article> {
         return try {
             val response = withContext(Dispatchers.IO) {
                 timesApiService.getNews(source, section, apiKey)
@@ -53,15 +61,15 @@ class NewsRepository @Inject constructor(
         }
     }
 
-    suspend fun getSearchNews(
+    override suspend fun getSearchNews(
         q: String,
         apiKey: String
     ): List<Docs> {
         var responseList: List<Docs> = emptyList()
         try {
             val res = searchApiService.searchNews(q, apiKey)
-           responseList = res.response.docs
-        }catch (_:HttpException){
+            responseList = res.response.docs
+        } catch (_: HttpException) {
 
         }
         return responseList

@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -13,13 +14,15 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
+import javax.inject.Inject
 
-class TickersWebSocket(
+class TickersWebSocket@Inject constructor(
     private val client: OkHttpClient,
     private val apiUrl: String
 ) {
     private val _tickerUpdates =
-        MutableSharedFlow<StockQuote?>(replay = 1, extraBufferCapacity = 100)
+        MutableSharedFlow<TickersWebSocketData?>(replay = 1, extraBufferCapacity = 100)
+    val tickerUpdates: SharedFlow<TickersWebSocketData?> get() = _tickerUpdates
 
     private var webSocket: WebSocket? = null
     var isConnected = false
@@ -40,7 +43,11 @@ class TickersWebSocket(
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.i("WEBSOCKET", "Received message: $text")
                 val update = parseStockQuote(text)
-                _tickerUpdates.tryEmit(update)
+                if (update != null) {
+                    _tickerUpdates.tryEmit(update)
+                } else {
+                    Log.e("WEBSOCKET", "Failed to parse stock quote.")
+                }
 
             }
 
@@ -52,20 +59,25 @@ class TickersWebSocket(
         })
     }
 
-    private fun parseStockQuote(jsonString: String): StockQuote? {
+
+    private fun parseStockQuote(jsonString: String): TickersWebSocketData? {
         return try {
             val jsonObject = JSONObject(jsonString)
+            val dataArray = jsonObject.getJSONArray("data")
 
-            StockQuote(
-                c = jsonObject.getDouble("c"),
-                d = jsonObject.getDouble("d"),
-                dp = jsonObject.getDouble("dp"),
-                h = jsonObject.getDouble("h"),
-                l = jsonObject.getDouble("l"),
-                o = jsonObject.getDouble("o"),
-                pc = jsonObject.getDouble("pc"),
-            )
+            if (dataArray.length() > 0) {
+                val item = dataArray.getJSONObject(0)
+                TickersWebSocketData(
+                    p = item.getDouble("p"),
+                    s = item.getString("s"),
+                    v = item.getInt("v"),
+                    t = item.getLong("t"),
+                )
+            } else {
+                null
+            }
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }

@@ -2,11 +2,14 @@ package com.example.prod
 
 import android.app.Application
 import android.content.Context
-import com.example.apis.NewsRepository
-import com.example.apis.NewsViewModel
-import com.example.apis.RetrofitSearchTimesInstance
-import com.example.apis.RetrofitTimesInstance
-import com.example.apis.TimesApiService
+import com.example.apis.data.repository.NewsRepository
+import com.example.apis.data.NewsViewModel
+import com.example.apis.data.RetrofitSearchTimesInstance
+import com.example.apis.data.RetrofitTimesInstance
+import com.example.apis.data.TimesApiService
+import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
+import com.example.apis.domain.use_cases.GetNewsUseCase
+import com.example.apis.domain.use_cases.GetSearchNewsUseCase
 import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
@@ -23,9 +26,12 @@ import com.example.tickersapi.RetrofitTickersInstance
 import com.example.tickersapi.TickersApiService
 import com.example.tickersapi.TickersRepository
 import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.TickersWebSocket
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.Subcomponent
 import okhttp3.OkHttpClient
 import javax.inject.Named
 import javax.inject.Singleton
@@ -36,31 +42,47 @@ class TimesApiModule {
     @Provides
     @Singleton
     @Named("newsApi")
-    fun provideTimesApiService(): TimesApiService {
-        return RetrofitTimesInstance.api
-    }
+    fun provideTimesApiService() = RetrofitTimesInstance.api
+
 
     @Provides
     @Singleton
     @Named("searchApi")
-    fun provideSearchApiService(): TimesApiService {
-        return RetrofitSearchTimesInstance.api
-    }
+    fun provideSearchApiService() = RetrofitSearchTimesInstance.api
+
 
     @Provides
     @Singleton
     fun provideNewsRepository(
         @Named("newsApi") timesApiService: TimesApiService,
         @Named("searchApi") searchApiService: TimesApiService
-    ): NewsRepository {
-        return NewsRepository(timesApiService, searchApiService)
-    }
+    ) = NewsRepository(timesApiService, searchApiService)
+
 
     @Provides
     @Singleton
-    fun provideNewsViewModel(repository: NewsRepository): NewsViewModel {
-        return NewsViewModel(repository)
-    }
+    fun provideNewsViewModel(
+        getNewsUseCase: GetNewsUseCase,
+        getNewsPullToRefreshUseCase: GetNewsPullToRefreshUseCase,
+        getSearchNewsUseCase: GetSearchNewsUseCase
+    ) = NewsViewModel(
+        getNewsUseCase = getNewsUseCase,
+        getNewsPullToRefreshUseCase = getNewsPullToRefreshUseCase,
+        getSearchNewsUseCase = getSearchNewsUseCase
+    )
+
+
+    @Provides
+    @Singleton
+    fun getNewsUseCase(newsRepository: NewsRepository) = GetNewsUseCase(newsRepository)
+
+    @Provides
+    @Singleton
+    fun getNewsPullToRefreshUseCase(newsRepository: NewsRepository) = GetNewsPullToRefreshUseCase(newsRepository)
+
+    @Provides
+    @Singleton
+    fun getSearchNewsUseCase(newsRepository: NewsRepository) = GetSearchNewsUseCase(newsRepository)
 
 }
 
@@ -98,20 +120,19 @@ class TickersApiModel {
 
     @Provides
     @Singleton
-    fun provideTickersViewModel(repository: TickersRepository): TickersViewModel {
-        return TickersViewModel(repository)
+    fun provideTickersViewModel(
+        repository: TickersRepository,
+        tickersWebSocket: TickersWebSocket
+    ): TickersViewModel {
+        return TickersViewModel(repository, tickersWebSocket)
     }
 }
 
 @Module
-class AppModule(private val application: Application) {
+class AppModule {
     @Provides
     @Singleton
-    fun provideApplication(): Application = application
-
-    @Provides
-    @Singleton
-    fun provideContext(): Context = application.applicationContext
+    fun provideContext(application: Application): Context = application.applicationContext
 }
 
 @Module
@@ -138,7 +159,7 @@ class DataBaseFinanceModule {
 
 
 @Module
-class PostDatabaseModile {
+class PostDatabaseModule {
 
     @Provides
     @Singleton
@@ -177,14 +198,66 @@ class PostDatabaseModile {
     }
 }
 
-@Component(modules = [TimesApiModule::class, TickersApiModel::class, DataBaseFinanceModule::class, PostDatabaseModile::class, AppModule::class])
-@Singleton
-interface AppComponent {
-    fun inject(activity: MainActivity)
+@Subcomponent(modules = [DataBaseFinanceModule::class])
+interface FinanceComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): FinanceComponent
+    }
 
-    fun inject(newsViewModel: NewsViewModel)
-    fun inject(newsRepository: NewsRepository)
     fun inject(financeViewModel: FinanceViewModel)
+}
+
+@Subcomponent(modules = [PostDatabaseModule::class])
+interface PostComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): PostComponent
+    }
+
     fun inject(notesViewModel: NotesViewModel)
     fun inject(addNoteViewModel: AddNoteViewModel)
 }
+
+
+@Subcomponent(modules = [TimesApiModule::class])
+interface TimesComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): TimesComponent
+    }
+
+    fun inject(newsViewModel: NewsViewModel)
+    fun inject(newsRepository: NewsRepository)
+}
+
+@Subcomponent(modules = [TickersApiModel::class])
+interface TickersComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): TickersComponent
+    }
+
+    fun inject(tickersViewModel: TickersViewModel)
+}
+
+
+@Singleton
+@Component(
+    modules = [
+        AppModule::class,
+        TimesApiModule::class,
+        TickersApiModel::class,
+        PostDatabaseModule::class,
+        DataBaseFinanceModule::class
+    ]
+)
+interface AppComponent {
+    @Component.Factory
+    interface Factory {
+        fun create(@BindsInstance application: Application): AppComponent
+    }
+
+    fun inject(mainActivity: MainActivity)
+}
+

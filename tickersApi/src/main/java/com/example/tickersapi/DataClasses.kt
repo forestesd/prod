@@ -12,6 +12,13 @@ data class StockQuote(
     val pc: Double,
     val d: Double
 )
+
+data class TickersWebSocketData(
+    val p: Double,
+    val s: String,
+    val v: Int,
+    val t: Long
+)
 data class CompanyProfileResponse(
     val name: String?,
     val logo: String?,

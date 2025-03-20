@@ -21,7 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.apis.NewsViewModel
+import com.example.apis.data.NewsViewModel
 import com.example.tickersapi.TickersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
