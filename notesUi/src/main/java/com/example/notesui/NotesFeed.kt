@@ -45,9 +45,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.notesdata.NewsPostUi
-import com.example.notesdata.NotesViewModel
-import com.example.notesdata.PostUi
+import com.example.notesdata.domain.models.NewsPostUi
+import com.example.notesdata.data.NotesViewModel
+import com.example.notesdata.domain.models.PostUi
 
 @Composable
 fun NotesFeed(

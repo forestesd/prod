@@ -45,10 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.notesdata.AddNoteViewModel
-import com.example.notesdata.NotesViewModel
-import com.example.notesdata.db.NewsEntity
-import com.example.notesdata.db.TagEntity
+import com.example.notesdata.data.AddNoteViewModel
+import com.example.notesdata.data.NotesViewModel
+import com.example.notesdata.data.db.NewsEntity
+import com.example.notesdata.data.db.TagEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.notesdata
+package com.example.notesdata.domain.models
 
 data class PostUi(
     val postId: Long,

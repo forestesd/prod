@@ -1,4 +1,4 @@
-package com.example.notesdata.db
+package com.example.notesdata.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -27,7 +27,7 @@ interface PostDao {
      fun getAllPosts(): Flow<List<PostEntity>>
 
     @Query("SELECT * FROM post WHERE is_favorites != null")
-    suspend fun getFavoritesPosts():PostEntity
+    suspend fun getFavoritesPosts(): PostEntity
 
     @Query("UPDATE post SET is_favorites = :isFavorite WHERE id = :id")
     suspend fun updatePostFavoriteStatus(id: Long, isFavorite: Boolean)

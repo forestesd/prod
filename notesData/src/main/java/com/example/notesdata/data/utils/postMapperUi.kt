@@ -1,9 +1,11 @@
-package com.example.notesdata
+package com.example.notesdata.data.utils
 
-import com.example.notesdata.db.NewsEntity
-import com.example.notesdata.db.PostEntity
-import com.example.notesdata.db.PostImageEntity
-import com.example.notesdata.db.TagEntity
+import com.example.notesdata.domain.models.NewsPostUi
+import com.example.notesdata.domain.models.PostUi
+import com.example.notesdata.data.db.NewsEntity
+import com.example.notesdata.data.db.PostEntity
+import com.example.notesdata.data.db.PostImageEntity
+import com.example.notesdata.data.db.TagEntity
 
 fun postMapperUi(
     post: PostEntity,

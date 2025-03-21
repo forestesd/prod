@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notesdata.NewsPostUi
-import com.example.notesdata.NotesViewModel
+import com.example.notesdata.domain.models.NewsPostUi
+import com.example.notesdata.data.NotesViewModel
 
 @Composable
 fun NotesMainScreen(

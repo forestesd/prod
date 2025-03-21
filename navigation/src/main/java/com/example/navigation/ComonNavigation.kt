@@ -16,9 +16,9 @@ import com.example.financedate.FinanceViewModel
 import com.example.financeui.FinanceMainScreen
 import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews
-import com.example.notesdata.AddNoteViewModel
-import com.example.notesdata.NotesViewModel
-import com.example.notesdata.db.NewsEntity
+import com.example.notesdata.data.AddNoteViewModel
+import com.example.notesdata.data.NotesViewModel
+import com.example.notesdata.data.db.NewsEntity
 import com.example.notesui.AddNoteScreen
 import com.example.notesui.FavoritesScreen
 import com.example.notesui.NotesMainScreen

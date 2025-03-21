@@ -1,27 +1,20 @@
-package com.example.notesdata
+package com.example.notesdata.data.repository
 
-import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.notesdata.db.NewsDao
-import com.example.notesdata.db.NewsEntity
-import com.example.notesdata.db.PostDao
-import com.example.notesdata.db.PostEntity
-import com.example.notesdata.db.PostImageEntity
-import com.example.notesdata.db.PostTagEntity
-import com.example.notesdata.db.TagEntity
+import com.example.notesdata.data.db.NewsDao
+import com.example.notesdata.data.db.NewsEntity
+import com.example.notesdata.data.db.PostDao
+import com.example.notesdata.data.db.PostEntity
+import com.example.notesdata.data.db.PostImageEntity
+import com.example.notesdata.data.db.PostTagEntity
+import com.example.notesdata.data.db.TagEntity
+import com.example.notesdata.domain.repository.AddNoteRepositoryInterface
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -30,86 +23,73 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class AddNoteViewModel @Inject constructor(
-    application: Application,
+class AddNoteRepository @Inject constructor(
     private val postDao: PostDao,
     private val newsDao: NewsDao
-) : AndroidViewModel(application) {
-    private val _selectedImage = MutableStateFlow<List<Uri>>(emptyList())
-    val selectedImage: StateFlow<List<Uri>> get() = _selectedImage
+) : AddNoteRepositoryInterface {
 
-    private val _selectedTags = mutableStateOf<List<TagEntity>>(emptyList())
-    val selectedTags: State<List<TagEntity>> = _selectedTags
+    override suspend fun saveNote(
+        context: Context,
+        news: NewsEntity?,
+        noteContent: String,
+        selectedImage: List<Uri>,
+        selectedTags: List<TagEntity>
+    ) {
+        if (news != null) newsDao.insertNews(news)
+        val newsId = news?.let { newsDao.getNewsByUrl(it.articleUrl).id }
 
-    private val _noteContent = mutableStateOf("")
+        val post = PostEntity(
+            content = noteContent,
+            createdAt = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+            newsId = newsId
+        )
 
-    fun saveImageUri(uris: List<Uri>) {
-        _selectedImage.value += uris
-    }
-
-    fun saveTags(tags: List<TagEntity>) {
-        _selectedTags.value = tags
-    }
-
-    fun saveNoteContent(content: String) {
-        _noteContent.value = content
-    }
-
-    fun saveNote(context: Context, news: NewsEntity?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (_noteContent.value.isNotBlank()) {
-                if (news != null) newsDao.insertNews(news)
-                val newsId = news?.let { newsDao.getNewsByUrl(it.articleUrl).id }
-
-                val post = PostEntity(
-                    content = _noteContent.value,
-                    createdAt = LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
-                    newsId = newsId
-                )
-
-                val images = _selectedImage.value.mapNotNull { uri ->
-                    saveImageToAppDirectory(context, uri)?.let {
-                        PostImageEntity(photoUrl = it.toString(), postId = post.id)
-                    }
-                }
-
-                val tags = _selectedTags.value.map { tag ->
-                    PostTagEntity(tagId = tag.id, postId = post.id)
-                }
-                postDao.insertPostWithImagesAndTags(post, images, tags)
+        val images = selectedImage.mapNotNull { uri ->
+            saveImageToAppDirectory(context, uri)?.let {
+                PostImageEntity(photoUrl = it.toString(), postId = post.id)
             }
-
-            clearData()
         }
 
+        val tags = selectedTags.map { tag ->
+            PostTagEntity(tagId = tag.id, postId = post.id)
+        }
+        postDao.insertPostWithImagesAndTags(post, images, tags)
     }
 
-    fun clearData() {
-        _selectedImage.value = emptyList()
-        _selectedTags.value = emptyList()
-        _noteContent.value = ""
-    }
+    override suspend fun saveImageToAppDirectory(context: Context, imageUri: Uri): Uri? {
+        val fileName = "image_${System.currentTimeMillis()}.jpg"
 
-    private suspend fun saveImageToAppDirectory(context: Context, imageUri: Uri): Uri? =
-        withContext(Dispatchers.IO) {
-            val fileName = "image_${System.currentTimeMillis()}.jpg"
-
+        return try {
+            // Поворот и сжатие изображения
             val rotatedUri = rotateImageIfNeeded(context, imageUri)
             val compressedUri = compressImage(context, rotatedUri)
 
-            compressedUri?.let {
-                val inputStream = context.contentResolver.openInputStream(it)
-                val file = File(context.getExternalFilesDir(null), fileName)
-                val outputStream = FileOutputStream(file)
-                inputStream?.copyTo(outputStream)
-                inputStream?.close()
-                outputStream.close()
+            compressedUri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val externalFilesDir = context.getExternalFilesDir(null)
 
-                Uri.fromFile(file)
+                if (externalFilesDir != null) {
+                    val file = File(externalFilesDir, fileName)
+                    val outputStream = FileOutputStream(file)
+
+                    inputStream?.use { input ->
+                        outputStream.use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+
+                    Uri.fromFile(file)
+                } else {
+                    null
+                }
             }
-
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
+
 
     private suspend fun rotateImageIfNeeded(context: Context, imageUri: Uri): Uri =
         withContext(Dispatchers.IO) {

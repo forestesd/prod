@@ -2,11 +2,11 @@ package com.example.prod
 
 import android.app.Application
 import android.content.Context
-import com.example.apis.data.repository.NewsRepositoryInterface
 import com.example.apis.data.NewsViewModel
 import com.example.apis.data.RetrofitSearchTimesInstance
 import com.example.apis.data.RetrofitTimesInstance
 import com.example.apis.data.TimesApiService
+import com.example.apis.data.repository.NewsRepositoryInterface
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
@@ -14,22 +14,23 @@ import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
-import com.example.notesdata.AddNoteViewModel
-import com.example.notesdata.NotesViewModel
-import com.example.notesdata.db.NewsDao
-import com.example.notesdata.db.PostDao
-import com.example.notesdata.db.PostDatabase
-import com.example.notesdata.db.PostImageDao
-import com.example.notesdata.db.PostTagDao
-import com.example.notesdata.db.TagDao
+import com.example.notesdata.data.AddNoteViewModel
+import com.example.notesdata.data.NotesViewModel
+import com.example.notesdata.data.db.NewsDao
+import com.example.notesdata.data.db.PostDao
+import com.example.notesdata.data.db.PostDatabase
+import com.example.notesdata.data.repository.AddNoteRepository
+import com.example.notesdata.domain.repository.AddNoteRepositoryInterface
+import com.example.notesdata.domain.use_cases.SaveNoteUseCase
+import com.example.tickersapi.data.TickersViewModel
 import com.example.tickersapi.data.remote.RetrofitTickersInstance
 import com.example.tickersapi.data.remote.TickersApiService
-import com.example.tickersapi.data.repository.TickersRepositoryInterface
-import com.example.tickersapi.data.TickersViewModel
 import com.example.tickersapi.data.remote.TickersWebSocket
+import com.example.tickersapi.data.repository.TickersRepositoryInterface
 import com.example.tickersapi.domain.use_cases.GetCompanyInfoUseCase
 import com.example.tickersapi.domain.use_cases.SearchCompanyUseCase
 import com.example.tickersapi.domain.use_cases.WebSocketOpenUseCase
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -184,82 +185,45 @@ class PostDatabaseModule {
 
     @Provides
     @Singleton
-    fun providePostDatabase(context: Context): PostDatabase {
-        return PostDatabase.getDB(context)
-    }
+    fun providePostDatabase(context: Context) = PostDatabase.getDB(context)
+
 
     @Provides
     @Singleton
-    fun providePostDao(postDatabase: PostDatabase): PostDao {
-        return postDatabase.postDao()
-    }
+    fun providePostDao(postDatabase: PostDatabase) = postDatabase.postDao()
+
 
     @Provides
     @Singleton
-    fun providePostImageDao(postDatabase: PostDatabase): PostImageDao {
-        return postDatabase.postImageDao()
-    }
+    fun providePostImageDao(postDatabase: PostDatabase) = postDatabase.postImageDao()
+
 
     @Provides
     @Singleton
-    fun provideTagDao(postDatabase: PostDatabase): TagDao {
-        return postDatabase.tagDao()
-    }
+    fun provideTagDao(postDatabase: PostDatabase) = postDatabase.tagDao()
+
 
     @Provides
     @Singleton
-    fun providePostTagDao(postDatabase: PostDatabase): PostTagDao {
-        return postDatabase.postTagDao()
-    }
+    fun providePostTagDao(postDatabase: PostDatabase) = postDatabase.postTagDao()
+
 
     @Provides
     @Singleton
-    fun provideNewsDao(postDatabase: PostDatabase): NewsDao {
-        return postDatabase.newsDao()
-    }
+    fun provideNewsDao(postDatabase: PostDatabase) = postDatabase.newsDao()
+
+    @Provides
+    @Singleton
+    fun provideSaveNoteUseCase(addNoteRepositoryInterface: AddNoteRepositoryInterface) =
+        SaveNoteUseCase(addNoteRepositoryInterface)
 }
 
-@Subcomponent(modules = [DataBaseFinanceModule::class])
-interface FinanceComponent {
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): FinanceComponent
-    }
+@Module
+interface RepositoryModule {
 
-    fun inject(financeViewModel: FinanceViewModel)
-}
-
-@Subcomponent(modules = [PostDatabaseModule::class])
-interface PostComponent {
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): PostComponent
-    }
-
-    fun inject(notesViewModel: NotesViewModel)
-    fun inject(addNoteViewModel: AddNoteViewModel)
-}
-
-
-@Subcomponent(modules = [TimesApiModule::class])
-interface TimesComponent {
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): TimesComponent
-    }
-
-    fun inject(newsViewModel: NewsViewModel)
-    fun inject(newsRepository: NewsRepositoryInterface)
-}
-
-@Subcomponent(modules = [TickersApiModel::class])
-interface TickersComponent {
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): TickersComponent
-    }
-
-    fun inject(tickersViewModel: TickersViewModel)
+    @Binds
+    @Singleton
+    fun bindAddNoteRepository(addNoteRepository: AddNoteRepository): AddNoteRepositoryInterface
 }
 
 
@@ -270,7 +234,8 @@ interface TickersComponent {
         TimesApiModule::class,
         TickersApiModel::class,
         PostDatabaseModule::class,
-        DataBaseFinanceModule::class
+        DataBaseFinanceModule::class,
+        RepositoryModule::class
     ]
 )
 interface AppComponent {

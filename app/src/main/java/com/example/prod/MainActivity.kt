@@ -10,8 +10,8 @@ import androidx.core.view.WindowCompat
 import com.example.apis.data.NewsViewModel
 import com.example.financedate.FinanceViewModel
 import com.example.navigation.AppNavigation
-import com.example.notesdata.AddNoteViewModel
-import com.example.notesdata.NotesViewModel
+import com.example.notesdata.data.AddNoteViewModel
+import com.example.notesdata.data.NotesViewModel
 import com.example.tickersapi.data.TickersViewModel
 import javax.inject.Inject
 

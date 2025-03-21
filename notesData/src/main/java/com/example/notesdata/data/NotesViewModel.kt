@@ -1,4 +1,4 @@
-package com.example.notesdata
+package com.example.notesdata.data
 
 import android.app.Application
 import androidx.compose.runtime.State
@@ -6,12 +6,14 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notesdata.db.NewsDao
-import com.example.notesdata.db.PostDao
-import com.example.notesdata.db.PostImageDao
-import com.example.notesdata.db.PostTagDao
-import com.example.notesdata.db.TagDao
-import com.example.notesdata.db.TagEntity
+import com.example.notesdata.domain.models.PostUi
+import com.example.notesdata.data.db.NewsDao
+import com.example.notesdata.data.db.PostDao
+import com.example.notesdata.data.db.PostImageDao
+import com.example.notesdata.data.db.PostTagDao
+import com.example.notesdata.data.db.TagDao
+import com.example.notesdata.data.db.TagEntity
+import com.example.notesdata.data.utils.postMapperUi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
