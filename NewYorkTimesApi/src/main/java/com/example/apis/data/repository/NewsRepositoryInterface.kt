@@ -4,17 +4,17 @@ import androidx.compose.runtime.mutableStateOf
 import com.example.apis.data.TimesApiService
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs
-import com.example.apis.domain.repository.NewsRepository
+import com.example.apis.domain.repository.NewsRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Named
 
-class NewsRepository @Inject constructor(
+class NewsRepositoryInterface @Inject constructor(
     @Named("newsApi") val timesApiService: TimesApiService,
     @Named("searchApi") val searchApiService: TimesApiService
-) : NewsRepository {
+) : NewsRepositoryInterface {
     private var cachedNews = mutableStateOf<List<Article>>(emptyList())
     private var lastUpdateTime = 0L
     private val cacheDuration = 6 * 60 * 60 * 1000L

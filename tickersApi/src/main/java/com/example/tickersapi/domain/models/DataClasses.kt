@@ -1,4 +1,4 @@
-package com.example.tickersapi
+package com.example.tickersapi.domain.models
 
 import androidx.compose.ui.graphics.Color
 

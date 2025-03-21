@@ -32,7 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apis.data.NewsViewModel
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.data.TickersViewModel
 import kotlinx.coroutines.delay
 
 

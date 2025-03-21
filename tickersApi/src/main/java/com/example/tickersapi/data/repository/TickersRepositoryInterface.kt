@@ -1,24 +1,29 @@
-package com.example.tickersapi
+package com.example.tickersapi.data.repository
 
 
 import android.content.Context
+import com.example.tickersapi.R
+import com.example.tickersapi.domain.models.TickerUi
+import com.example.tickersapi.data.remote.TickersApiService
+import com.example.tickersapi.data.remote.TickersWebSocket
+import com.example.tickersapi.data.utils.tickersUiMapper
+import com.example.tickersapi.domain.repository.TickersRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import org.json.JSONArray
 import retrofit2.HttpException
 import java.io.InputStreamReader
 import javax.inject.Inject
 
-class TickersRepository @Inject constructor(
+class TickersRepositoryInterface @Inject constructor(
     private val context: Context,
     private val api: TickersApiService,
     client: OkHttpClient,
     apiUrl: String,
-) {
+) : TickersRepositoryInterface {
     private val tickers = loadTickersFromJSON()
     private val webSocket = TickersWebSocket(client, apiUrl)
 
@@ -36,7 +41,7 @@ class TickersRepository @Inject constructor(
         return tickersList
     }
 
-    suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
+    override suspend fun getCompanyInfo(apiKey: String): List<TickerUi> {
         val tickersUi = mutableListOf<TickerUi>()
 
         coroutineScope {
@@ -61,7 +66,11 @@ class TickersRepository @Inject constructor(
         return tickersUi
     }
 
-    suspend fun searchCompany(apiKey: String, q: String, exchange: String): List<TickerUi> {
+    override suspend fun searchCompany(
+        apiKey: String,
+        q: String,
+        exchange: String
+    ): List<TickerUi> {
         val tickerUi = mutableListOf<TickerUi>()
 
         coroutineScope {
@@ -79,7 +88,7 @@ class TickersRepository @Inject constructor(
                                 }
                             }
                             break
-                        } catch (_: HttpException){
+                        } catch (_: HttpException) {
 
                         }
                     }
@@ -92,7 +101,7 @@ class TickersRepository @Inject constructor(
 
     }
 
-    suspend fun webSocketOpen() {
+    override suspend fun webSocketOpen() {
         if (!webSocket.isConnected) {
             webSocket.connect()
         }

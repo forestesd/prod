@@ -1,6 +1,9 @@
-package com.example.tickersapi
+package com.example.tickersapi.data.utils
 
 import androidx.compose.ui.graphics.Color
+import com.example.tickersapi.domain.models.CompanyProfileResponse
+import com.example.tickersapi.domain.models.StockQuote
+import com.example.tickersapi.domain.models.TickerUi
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale

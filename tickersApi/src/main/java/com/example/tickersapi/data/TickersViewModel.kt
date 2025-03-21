@@ -1,17 +1,22 @@
-package com.example.tickersapi
-
-import android.util.Log
+package com.example.tickersapi.data
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tickersapi.domain.models.TickerUi
+import com.example.tickersapi.data.remote.TickersWebSocket
+import com.example.tickersapi.domain.use_cases.GetCompanyInfoUseCase
+import com.example.tickersapi.domain.use_cases.SearchCompanyUseCase
+import com.example.tickersapi.domain.use_cases.WebSocketOpenUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TickersViewModel @Inject constructor(
-    private val repository: TickersRepository,
+    private val getCompanyInfoUseCase: GetCompanyInfoUseCase,
+    private val searchCompanyUseCase: SearchCompanyUseCase,
+    private val webSocketOpenUseCase: WebSocketOpenUseCase,
     private val webSocket: TickersWebSocket
 ) : ViewModel() {
     private val _tickers = MutableStateFlow<List<TickerUi>>(emptyList())
@@ -26,7 +31,7 @@ class TickersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.webSocketOpen()
+            webSocketOpenUseCase.invoke()
         }
     }
 
@@ -52,7 +57,7 @@ class TickersViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
 
-            _tickers.value = repository.getCompanyInfo("cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
+            _tickers.value = getCompanyInfoUseCase.invoke("cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
 
             _isLoading.value = false
         }
@@ -62,7 +67,7 @@ class TickersViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
 
-            _tickers.value = repository.searchCompany(
+            _tickers.value = searchCompanyUseCase.invoke(
                 q = q,
                 exchange = "US",
                 apiKey = "cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg"

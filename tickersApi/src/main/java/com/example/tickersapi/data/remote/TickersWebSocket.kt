@@ -1,6 +1,7 @@
-package com.example.tickersapi
+package com.example.tickersapi.data.remote
 
 import android.util.Log
+import com.example.tickersapi.domain.models.TickersWebSocketData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -31,7 +31,7 @@ import com.example.home.search.SearchScreen
 import com.example.home.shimmer.NewsShimmerListItem
 import com.example.home.shimmer.TickersShimmer
 import com.example.home.tickers.TickersFeedMain
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.data.TickersViewModel
 import kotlinx.coroutines.launch
 
 

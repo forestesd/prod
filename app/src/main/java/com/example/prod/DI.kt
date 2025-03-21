@@ -2,7 +2,7 @@ package com.example.prod
 
 import android.app.Application
 import android.content.Context
-import com.example.apis.data.repository.NewsRepository
+import com.example.apis.data.repository.NewsRepositoryInterface
 import com.example.apis.data.NewsViewModel
 import com.example.apis.data.RetrofitSearchTimesInstance
 import com.example.apis.data.RetrofitTimesInstance
@@ -22,11 +22,14 @@ import com.example.notesdata.db.PostDatabase
 import com.example.notesdata.db.PostImageDao
 import com.example.notesdata.db.PostTagDao
 import com.example.notesdata.db.TagDao
-import com.example.tickersapi.RetrofitTickersInstance
-import com.example.tickersapi.TickersApiService
-import com.example.tickersapi.TickersRepository
-import com.example.tickersapi.TickersViewModel
-import com.example.tickersapi.TickersWebSocket
+import com.example.tickersapi.data.remote.RetrofitTickersInstance
+import com.example.tickersapi.data.remote.TickersApiService
+import com.example.tickersapi.data.repository.TickersRepositoryInterface
+import com.example.tickersapi.data.TickersViewModel
+import com.example.tickersapi.data.remote.TickersWebSocket
+import com.example.tickersapi.domain.use_cases.GetCompanyInfoUseCase
+import com.example.tickersapi.domain.use_cases.SearchCompanyUseCase
+import com.example.tickersapi.domain.use_cases.WebSocketOpenUseCase
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -56,7 +59,7 @@ class TimesApiModule {
     fun provideNewsRepository(
         @Named("newsApi") timesApiService: TimesApiService,
         @Named("searchApi") searchApiService: TimesApiService
-    ) = NewsRepository(timesApiService, searchApiService)
+    ) = NewsRepositoryInterface(timesApiService, searchApiService)
 
 
     @Provides
@@ -74,15 +77,18 @@ class TimesApiModule {
 
     @Provides
     @Singleton
-    fun getNewsUseCase(newsRepository: NewsRepository) = GetNewsUseCase(newsRepository)
+    fun getNewsUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
+        GetNewsUseCase(newsRepositoryInterface)
 
     @Provides
     @Singleton
-    fun getNewsPullToRefreshUseCase(newsRepository: NewsRepository) = GetNewsPullToRefreshUseCase(newsRepository)
+    fun getNewsPullToRefreshUseCase(newsRepository: NewsRepositoryInterface) =
+        GetNewsPullToRefreshUseCase(newsRepository)
 
     @Provides
     @Singleton
-    fun getSearchNewsUseCase(newsRepository: NewsRepository) = GetSearchNewsUseCase(newsRepository)
+    fun getSearchNewsUseCase(newsRepository: NewsRepositoryInterface) =
+        GetSearchNewsUseCase(newsRepository)
 
 }
 
@@ -91,21 +97,18 @@ class TimesApiModule {
 class TickersApiModel {
     @Provides
     @Singleton
-    fun provideTickersApiService(): TickersApiService {
-        return RetrofitTickersInstance.api
-    }
+    fun provideTickersApiService() = RetrofitTickersInstance.api
+
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
-    }
+    fun provideOkHttpClient() = OkHttpClient.Builder().build()
+
 
     @Provides
     @Singleton
-    fun provideApiUrl(): String {
-        return "wss://ws.finnhub.io?"
-    }
+    fun provideApiUrl() = "wss://ws.finnhub.io?"
+
 
     @Provides
     @Singleton
@@ -114,18 +117,36 @@ class TickersApiModel {
         context: Context,
         client: OkHttpClient,
         apiUrl: String
-    ): TickersRepository {
-        return TickersRepository(context, api, client, apiUrl)
-    }
+    ) = TickersRepositoryInterface(context, api, client, apiUrl)
+
+    @Provides
+    @Singleton
+    fun provideGetCompanyInfoUseCase(tickersRepositoryInterface: TickersRepositoryInterface) =
+        GetCompanyInfoUseCase(tickersRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideSearchCompanyUseCase(tickersRepositoryInterface: TickersRepositoryInterface) =
+        SearchCompanyUseCase(tickersRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideWebSocketOpenUseCase(tickersRepositoryInterface: TickersRepositoryInterface) =
+        WebSocketOpenUseCase(tickersRepositoryInterface)
 
     @Provides
     @Singleton
     fun provideTickersViewModel(
-        repository: TickersRepository,
+        getCompanyInfoUseCase: GetCompanyInfoUseCase,
+        searchCompanyUseCase: SearchCompanyUseCase,
+        webSocketOpenUseCase: WebSocketOpenUseCase,
         tickersWebSocket: TickersWebSocket
-    ): TickersViewModel {
-        return TickersViewModel(repository, tickersWebSocket)
-    }
+    ) = TickersViewModel(
+        getCompanyInfoUseCase = getCompanyInfoUseCase,
+        searchCompanyUseCase = searchCompanyUseCase,
+        webSocketOpenUseCase = webSocketOpenUseCase,
+        webSocket = tickersWebSocket
+    )
 }
 
 @Module
@@ -228,7 +249,7 @@ interface TimesComponent {
     }
 
     fun inject(newsViewModel: NewsViewModel)
-    fun inject(newsRepository: NewsRepository)
+    fun inject(newsRepository: NewsRepositoryInterface)
 }
 
 @Subcomponent(modules = [TickersApiModel::class])

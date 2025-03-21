@@ -12,7 +12,7 @@ import com.example.financedate.FinanceViewModel
 import com.example.navigation.AppNavigation
 import com.example.notesdata.AddNoteViewModel
 import com.example.notesdata.NotesViewModel
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.data.TickersViewModel
 import javax.inject.Inject
 
 

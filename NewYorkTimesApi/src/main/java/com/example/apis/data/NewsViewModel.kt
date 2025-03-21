@@ -2,7 +2,6 @@ package com.example.apis.data
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.apis.data.repository.NewsRepository
 import com.example.apis.data.utils.docsMapperToArticle
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs

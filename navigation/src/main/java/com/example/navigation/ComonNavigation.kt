@@ -22,7 +22,7 @@ import com.example.notesdata.db.NewsEntity
 import com.example.notesui.AddNoteScreen
 import com.example.notesui.FavoritesScreen
 import com.example.notesui.NotesMainScreen
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.data.TickersViewModel
 import com.example.ui.NavigationUI
 
 @Composable

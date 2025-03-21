@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.apis.data.NewsViewModel
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.data.TickersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -34,22 +34,6 @@ import com.example.financedate.GoalWithProgress
 import com.example.financedate.formatedBigDecimalWithSpaces
 
 @Composable
-fun GoalsFrame(financeViewModel: FinanceViewModel) {
-
-
-
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.4f)
-            .padding(16.dp)
-    ) {
-
-    }
-}
-
-@Composable
 fun GoalObj(item: GoalWithProgress, financeViewModel: FinanceViewModel){
     var showDeleteDialog by remember { mutableStateOf(false) }
 

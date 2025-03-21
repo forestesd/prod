@@ -28,8 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.home.R
-import com.example.tickersapi.TickerUi
-import com.example.tickersapi.TickersViewModel
+import com.example.tickersapi.domain.models.TickerUi
+import com.example.tickersapi.data.TickersViewModel
 
 @Composable
 fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel) {

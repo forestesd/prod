@@ -1,4 +1,4 @@
-package com.example.tickersapi
+package com.example.tickersapi.data.remote
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
