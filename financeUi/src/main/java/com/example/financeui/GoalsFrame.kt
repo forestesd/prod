@@ -30,14 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.financedate.FinanceViewModel
+import com.example.financedate.GoalWithProgress
 import com.example.financedate.formatedBigDecimalWithSpaces
 
 @Composable
 fun GoalsFrame(financeViewModel: FinanceViewModel) {
 
-    val goals by financeViewModel.goalsWithProgress
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
+
 
     LazyColumn(
         modifier = Modifier
@@ -45,76 +45,81 @@ fun GoalsFrame(financeViewModel: FinanceViewModel) {
             .fillMaxHeight(0.4f)
             .padding(16.dp)
     ) {
-        items(goals, key = { item -> item.goal.id }) { item ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(bottom = 16.dp),
-                onClick = {
-                    showDeleteDialog = true
-                }
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = item.goal.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 10.dp, top = 5.dp)
-                    )
-                    if (item.goal.deadLine != null){
-                        Text(
-                            text = "До ${item.goal.deadLine}",
-                            modifier = Modifier.padding(start = 10.dp, top = 5.dp)
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        text = "${formatedBigDecimalWithSpaces(item.goal.currentCollected)}/${
-                            formatedBigDecimalWithSpaces(
-                                item.goal.totalCoastTarget
-                            )
-                        }",
-                        modifier = Modifier.padding(end = 10.dp, top = 5.dp)
-                    )
-                }
 
+    }
+}
 
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .height(15.dp)
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(color = Color.LightGray)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(item.progress)
-                            .background(item.progressColor)
-                    )
-                }
-            }
-            if (showDeleteDialog) {
-                DeleteDialog(
-                    onDelete = {
-                        financeViewModel.deleteGoal(item.goal)
-                        showDeleteDialog = false
-                    },
-                    onBack = {
-                        showDeleteDialog = false
-                    },
-                    item.goal.name
+@Composable
+fun GoalObj(item: GoalWithProgress, financeViewModel: FinanceViewModel){
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        onClick = {
+            showDeleteDialog = true
+        }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = item.goal.name,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 10.dp, top = 5.dp)
+            )
+            if (item.goal.deadLine != null){
+                Text(
+                    text = "До ${item.goal.deadLine}",
+                    modifier = Modifier.padding(start = 10.dp, top = 5.dp)
                 )
             }
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = "${formatedBigDecimalWithSpaces(item.goal.currentCollected)}/${
+                    formatedBigDecimalWithSpaces(
+                        item.goal.totalCoastTarget
+                    )
+                }",
+                modifier = Modifier.padding(end = 10.dp, top = 5.dp)
+            )
+        }
 
+
+        Row(
+            modifier = Modifier
+                .padding(10.dp)
+                .height(15.dp)
+                .clip(RoundedCornerShape(50.dp))
+                .background(color = Color.LightGray)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(item.progress)
+                    .background(item.progressColor)
+            )
         }
     }
+    if (showDeleteDialog) {
+        DeleteDialog(
+            onDelete = {
+                financeViewModel.deleteGoal(item.goal)
+                showDeleteDialog = false
+            },
+            onBack = {
+                showDeleteDialog = false
+            },
+            item.goal.name
+        )
+    }
+
 }
 
 @Composable
