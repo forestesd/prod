@@ -61,7 +61,6 @@ class AddNoteRepository @Inject constructor(
         val fileName = "image_${System.currentTimeMillis()}.jpg"
 
         return try {
-            // Поворот и сжатие изображения
             val rotatedUri = rotateImageIfNeeded(context, imageUri)
             val compressedUri = compressImage(context, rotatedUri)
 

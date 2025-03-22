@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +31,7 @@ fun FavoritesScreen(
     onNewsClicked: (NewsPostUi) -> Unit
 
 ){
-    val posts by notesViewModel.allPosts
+    val posts by notesViewModel.allPosts.collectAsState()
     val favoritePosts =  posts.filter { it.isFavorite }
     Column(
         modifier = Modifier.fillMaxSize(),

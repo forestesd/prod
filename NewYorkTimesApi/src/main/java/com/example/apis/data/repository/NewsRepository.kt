@@ -11,7 +11,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Named
 
-class NewsRepositoryInterface @Inject constructor(
+class NewsRepository @Inject constructor(
     @Named("newsApi") val timesApiService: TimesApiService,
     @Named("searchApi") val searchApiService: TimesApiService
 ) : NewsRepositoryInterface {

@@ -1,10 +1,9 @@
 package com.example.notesdata.data
 
-import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notesdata.domain.models.PostUi
 import com.example.notesdata.data.db.NewsDao
@@ -14,40 +13,42 @@ import com.example.notesdata.data.db.PostTagDao
 import com.example.notesdata.data.db.TagDao
 import com.example.notesdata.data.db.TagEntity
 import com.example.notesdata.data.utils.postMapperUi
+import com.example.notesdata.domain.use_cases.CheckFavoritesUseCase
+import com.example.notesdata.domain.use_cases.GetAllNotesUseCase
+import com.example.notesdata.domain.use_cases.GetAllTagsUseCase
+import com.example.notesdata.domain.use_cases.ToggleFavoriteUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class NotesViewModel @Inject constructor(
-    application: Application,
-    private val postDao: PostDao,
-    private val postImageDao: PostImageDao,
-    private val tagDao: TagDao,
-    private val postTagDao: PostTagDao,
-    private val newsDao: NewsDao
+    private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val getAllTagsUseCase: GetAllTagsUseCase,
+    private val checkFavoritesUseCase: CheckFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+) : ViewModel() {
 
-) : AndroidViewModel(application) {
+    private val _allTags = MutableStateFlow<List<TagEntity>>(emptyList())
+    val allTags: StateFlow<List<TagEntity>> = _allTags
 
-    private val _allTags = mutableStateOf<List<TagEntity>>(emptyList())
-    val allTags: State<List<TagEntity>> = _allTags
-
-    private val _allPosts = mutableStateOf<List<PostUi>>(emptyList())
-    val allPosts: State<List<PostUi>> = _allPosts
+    private val _allPosts = MutableStateFlow<List<PostUi>>(emptyList())
+    val allPosts: StateFlow<List<PostUi>> = _allPosts
 
 
     private val _favoritePosts = mutableStateMapOf<Long, Boolean>()
     val favoritePosts: Map<Long, Boolean> get() = _favoritePosts
 
 
-
     fun getAllTags() {
         viewModelScope.launch {
-            _allTags.value = tagDao.getAllTags()
+            _allTags.value = getAllTagsUseCase.invoke()
         }
     }
 
     fun checkFavorite(id: Long) {
         viewModelScope.launch {
-            val post = postDao.getPostById(id)
+            val post = checkFavoritesUseCase.invoke(id)
             _favoritePosts[id] = post?.ifFavorites ?: false
         }
     }
@@ -56,23 +57,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _favoritePosts[id] ?: false
             val newState = !currentState
-            postDao.updatePostFavoriteStatus(id, newState)
+            toggleFavoriteUseCase.invoke(id, newState)
             _favoritePosts[id] = newState
         }
     }
 
-    fun getAllNotes(){
+    fun getAllNotes() {
         viewModelScope.launch {
-            postDao.getAllPosts().collect { allPost ->
-                val posts = allPost.map { post ->
-                    val images = postImageDao.getImageByEventId(post.id)
-                    val tags = postTagDao.getTagsForPost(post.id)
-                    val allPostTag = tags.map { tagDao.getTagById(it.tagId) }
-                    _favoritePosts[post.id] = post.ifFavorites
-                    val news = post.newsId?.let { newsDao.getNewsById(it) }
-
-                    postMapperUi(post = post, image = images, tags = allPostTag, news = news)
-                }
+            getAllNotesUseCase.invoke().collect { posts ->
                 _allPosts.value = posts
             }
         }

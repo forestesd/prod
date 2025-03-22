@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,7 @@ fun NotesFeed(
     onNewsClicked: (NewsPostUi) -> Unit
 ) {
 
-    val posts by notesViewModel.allPosts
+    val posts by notesViewModel.allPosts.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()

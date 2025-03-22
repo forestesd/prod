@@ -6,27 +6,30 @@ import com.example.apis.data.NewsViewModel
 import com.example.apis.data.RetrofitSearchTimesInstance
 import com.example.apis.data.RetrofitTimesInstance
 import com.example.apis.data.TimesApiService
-import com.example.apis.data.repository.NewsRepositoryInterface
+import com.example.apis.data.repository.NewsRepository
+import com.example.apis.domain.repository.NewsRepositoryInterface
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
-import com.example.financedate.FinanceViewModel
 import com.example.financedate.db.FinanceDB
 import com.example.financedate.db.GoalDAO
 import com.example.financedate.db.TransactionDao
-import com.example.notesdata.data.AddNoteViewModel
-import com.example.notesdata.data.NotesViewModel
-import com.example.notesdata.data.db.NewsDao
-import com.example.notesdata.data.db.PostDao
 import com.example.notesdata.data.db.PostDatabase
 import com.example.notesdata.data.repository.AddNoteRepository
+import com.example.notesdata.data.repository.NotesRepository
 import com.example.notesdata.domain.repository.AddNoteRepositoryInterface
+import com.example.notesdata.domain.repository.NoteRepositoryInterface
+import com.example.notesdata.domain.use_cases.CheckFavoritesUseCase
+import com.example.notesdata.domain.use_cases.GetAllNotesUseCase
+import com.example.notesdata.domain.use_cases.GetAllTagsUseCase
 import com.example.notesdata.domain.use_cases.SaveNoteUseCase
+import com.example.notesdata.domain.use_cases.ToggleFavoriteUseCase
 import com.example.tickersapi.data.TickersViewModel
 import com.example.tickersapi.data.remote.RetrofitTickersInstance
 import com.example.tickersapi.data.remote.TickersApiService
 import com.example.tickersapi.data.remote.TickersWebSocket
-import com.example.tickersapi.data.repository.TickersRepositoryInterface
+import com.example.tickersapi.data.repository.TickersRepository
+import com.example.tickersapi.domain.repository.TickersRepositoryInterface
 import com.example.tickersapi.domain.use_cases.GetCompanyInfoUseCase
 import com.example.tickersapi.domain.use_cases.SearchCompanyUseCase
 import com.example.tickersapi.domain.use_cases.WebSocketOpenUseCase
@@ -35,7 +38,6 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dagger.Subcomponent
 import okhttp3.OkHttpClient
 import javax.inject.Named
 import javax.inject.Singleton
@@ -60,7 +62,7 @@ class TimesApiModule {
     fun provideNewsRepository(
         @Named("newsApi") timesApiService: TimesApiService,
         @Named("searchApi") searchApiService: TimesApiService
-    ) = NewsRepositoryInterface(timesApiService, searchApiService)
+    ) = NewsRepository(timesApiService, searchApiService)
 
 
     @Provides
@@ -78,18 +80,18 @@ class TimesApiModule {
 
     @Provides
     @Singleton
-    fun getNewsUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
+    fun getNewsUseCase(newsRepositoryInterface: NewsRepository) =
         GetNewsUseCase(newsRepositoryInterface)
 
     @Provides
     @Singleton
-    fun getNewsPullToRefreshUseCase(newsRepository: NewsRepositoryInterface) =
-        GetNewsPullToRefreshUseCase(newsRepository)
+    fun getNewsPullToRefreshUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
+        GetNewsPullToRefreshUseCase(newsRepositoryInterface)
 
     @Provides
     @Singleton
-    fun getSearchNewsUseCase(newsRepository: NewsRepositoryInterface) =
-        GetSearchNewsUseCase(newsRepository)
+    fun getSearchNewsUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
+        GetSearchNewsUseCase(newsRepositoryInterface)
 
 }
 
@@ -118,7 +120,7 @@ class TickersApiModel {
         context: Context,
         client: OkHttpClient,
         apiUrl: String
-    ) = TickersRepositoryInterface(context, api, client, apiUrl)
+    ) = TickersRepository(context, api, client, apiUrl)
 
     @Provides
     @Singleton
@@ -216,6 +218,26 @@ class PostDatabaseModule {
     @Singleton
     fun provideSaveNoteUseCase(addNoteRepositoryInterface: AddNoteRepositoryInterface) =
         SaveNoteUseCase(addNoteRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideGetAllNotesUseCase(noteRepositoryInterface: NoteRepositoryInterface) =
+        GetAllNotesUseCase(noteRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideGetAllTagsUseCase(noteRepositoryInterface: NoteRepositoryInterface) =
+        GetAllTagsUseCase(noteRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideCheckFavoritesUseCase(noteRepositoryInterface: NoteRepositoryInterface) =
+        CheckFavoritesUseCase(noteRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideToggleFavoriteUseCase(noteRepositoryInterface: NoteRepositoryInterface) =
+        ToggleFavoriteUseCase(noteRepositoryInterface)
 }
 
 @Module
@@ -224,6 +246,18 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindAddNoteRepository(addNoteRepository: AddNoteRepository): AddNoteRepositoryInterface
+
+    @Binds
+    @Singleton
+    fun bindNewsRepository(newsRepository: NewsRepository): NewsRepositoryInterface
+
+    @Binds
+    @Singleton
+    fun bindsTickersRepository(tickersRepository: TickersRepository): TickersRepositoryInterface
+
+    @Binds
+    @Singleton
+    fun bindsNotesRepository(notesRepository: NotesRepository): NoteRepositoryInterface
 }
 
 

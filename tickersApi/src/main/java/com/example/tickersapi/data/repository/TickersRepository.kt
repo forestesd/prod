@@ -18,7 +18,7 @@ import retrofit2.HttpException
 import java.io.InputStreamReader
 import javax.inject.Inject
 
-class TickersRepositoryInterface @Inject constructor(
+class TickersRepository @Inject constructor(
     private val context: Context,
     private val api: TickersApiService,
     client: OkHttpClient,
