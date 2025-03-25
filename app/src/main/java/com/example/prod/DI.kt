@@ -8,6 +8,7 @@ import com.example.apis.data.RetrofitTimesInstance
 import com.example.apis.data.TimesApiService
 import com.example.apis.data.repository.NewsRepository
 import com.example.apis.domain.repository.NewsRepositoryInterface
+import com.example.apis.domain.use_cases.GetFiltersUseCase
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
@@ -69,8 +70,9 @@ class TimesApiModule {
     @Singleton
     fun provideNewsRepository(
         @Named("newsApi") timesApiService: TimesApiService,
-        @Named("searchApi") searchApiService: TimesApiService
-    ) = NewsRepository(timesApiService, searchApiService)
+        @Named("searchApi") searchApiService: TimesApiService,
+        context: Context
+    ) = NewsRepository(timesApiService, searchApiService, context)
 
 
     @Provides
@@ -100,6 +102,11 @@ class TimesApiModule {
     @Singleton
     fun getSearchNewsUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
         GetSearchNewsUseCase(newsRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideGetFiltersUseCase(newsRepositoryInterface: NewsRepositoryInterface) =
+        GetFiltersUseCase(newsRepositoryInterface)
 
 }
 

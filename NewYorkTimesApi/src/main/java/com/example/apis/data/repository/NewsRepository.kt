@@ -1,19 +1,24 @@
 package com.example.apis.data.repository
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import com.example.apis.R
 import com.example.apis.data.TimesApiService
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs
 import com.example.apis.domain.repository.NewsRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import retrofit2.HttpException
+import java.io.InputStreamReader
 import javax.inject.Inject
 import javax.inject.Named
 
 class NewsRepository @Inject constructor(
     @Named("newsApi") val timesApiService: TimesApiService,
-    @Named("searchApi") val searchApiService: TimesApiService
+    @Named("searchApi") val searchApiService: TimesApiService,
+    private val context: Context
 ) : NewsRepositoryInterface {
     private var cachedNews = mutableStateOf<List<Article>>(emptyList())
     private var lastUpdateTime = 0L
@@ -76,5 +81,20 @@ class NewsRepository @Inject constructor(
 
     }
 
+    override suspend fun getFilters(): List<String> {
+        return loadFiltersFromJSON()
+    }
 
+    private fun loadFiltersFromJSON(): List<String> {
+        val jsonFile = context.resources.openRawResource(R.raw.filters)
+        val reader = InputStreamReader(jsonFile)
+        val jsonStr = reader.readText()
+
+        val jsonArray = JSONArray(jsonStr)
+        val tickersList = mutableListOf<String>()
+        for (i in 0..<jsonArray.length()) {
+            tickersList.add(jsonArray.getString(i))
+        }
+        return tickersList
+    }
 }

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.apis.data.utils.docsMapperToArticle
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs
+import com.example.apis.domain.models.NewsUi
+import com.example.apis.domain.use_cases.GetFiltersUseCase
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
@@ -19,10 +21,16 @@ import javax.inject.Inject
 class NewsViewModel @Inject constructor(
     private val getNewsUseCase: GetNewsUseCase,
     private val getNewsPullToRefreshUseCase: GetNewsPullToRefreshUseCase,
-    private val getSearchNewsUseCase: GetSearchNewsUseCase
+    private val getSearchNewsUseCase: GetSearchNewsUseCase,
+    private val getFiltersUseCase: GetFiltersUseCase
 ) : ViewModel() {
-    private val _news = MutableStateFlow<List<Article>>(emptyList())
-    val news: StateFlow<List<Article>> = _news
+    private val _news = MutableStateFlow(
+        NewsUi(
+            news = emptyList(),
+            filters = emptyList()
+        )
+    )
+    val news: StateFlow<NewsUi> = _news
 
     private var _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -33,6 +41,15 @@ class NewsViewModel @Inject constructor(
     private var _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching
 
+    init {
+        loadFilters()
+    }
+
+    private fun loadFilters(){
+        viewModelScope.launch {
+            _news.value.filters = getFiltersUseCase.invoke()
+        }
+    }
 
     private fun validateNews(newsList: List<Article>): List<Article> {
         return newsList.map { newsItem ->
@@ -61,7 +78,7 @@ class NewsViewModel @Inject constructor(
 
             val newsList =
                 getNewsUseCase.invoke("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
-            _news.value = validateNews(newsList)
+            _news.value.news = validateNews(newsList)
 
             _isLoading.value = false
 
@@ -79,7 +96,7 @@ class NewsViewModel @Inject constructor(
                     "world",
                     "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg"
                 )
-            _news.value = validateNews(newsList)
+            _news.value.news = validateNews(newsList)
 
             _isLoading.value = false
 

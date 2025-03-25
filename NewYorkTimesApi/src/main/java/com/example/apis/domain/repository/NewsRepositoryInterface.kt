@@ -9,4 +9,6 @@ interface NewsRepositoryInterface {
     suspend fun getNewsPullToRefresh(source: String, section: String, apiKey: String): List<Article>
 
     suspend fun getSearchNews(q: String, apiKey: String): List<Docs>
+
+    suspend fun getFilters():List<String>
 }

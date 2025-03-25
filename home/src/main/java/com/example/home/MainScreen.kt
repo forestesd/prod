@@ -1,5 +1,6 @@
 package com.example.home
 
+import android.widget.Spinner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -139,6 +141,15 @@ fun MainScreen(
                 }
             }
 
+            item {
+                LazyRow(
+                   modifier =  Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                }
+
+            }
 
             if (newsLoading) {
 
@@ -151,7 +162,9 @@ fun MainScreen(
                 }
 
             } else {
-                items(if (isSearchingNews) serchNews else news, key = { item -> item.title }) { item ->
+                items(
+                    if (isSearchingNews) serchNews else news,
+                    key = { item -> item.title }) { item ->
                     NewsCard(
                         item, newsViewModel
                     ) {

@@ -7,6 +7,11 @@ data class TimesResponse(
 
     )
 
+data class NewsUi(
+    var news: List<Article>,
+    var filters: List<String>,
+)
+
 data class Article(
     val title: String,
     val url: String,
@@ -45,3 +50,4 @@ data class Docs(
 data class HeadLine(
     val main: String?
 )
+
