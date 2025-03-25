@@ -11,9 +11,17 @@ import com.example.apis.domain.repository.NewsRepositoryInterface
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
-import com.example.financedate.db.FinanceDB
-import com.example.financedate.db.GoalDAO
-import com.example.financedate.db.TransactionDao
+import com.example.financedate.data.db.FinanceDB
+import com.example.financedate.data.db.GoalDAO
+import com.example.financedate.data.db.TransactionDao
+import com.example.financedate.data.repository.FinanceRepository
+import com.example.financedate.domain.repository.FinanceRepositoryInterface
+import com.example.financedate.domain.use_cases.AddGoalUseCase
+import com.example.financedate.domain.use_cases.AddTransactionUseCase
+import com.example.financedate.domain.use_cases.AllAmountUseCase
+import com.example.financedate.domain.use_cases.DeleteGoalUseCase
+import com.example.financedate.domain.use_cases.GetGoalProgressUseCase
+import com.example.financedate.domain.use_cases.GetTransactionsUseCase
 import com.example.notesdata.data.db.PostDatabase
 import com.example.notesdata.data.repository.AddNoteRepository
 import com.example.notesdata.data.repository.NotesRepository
@@ -164,21 +172,48 @@ class DataBaseFinanceModule {
 
     @Provides
     @Singleton
-    fun provideGoalDAO(financeDb: FinanceDB): GoalDAO {
-        return financeDb.goalDao()
-    }
+    fun provideGoalDAO(financeDb: FinanceDB) = financeDb.goalDao()
+
 
     @Provides
     @Singleton
-    fun provideTransactionDao(financeDb: FinanceDB): TransactionDao {
-        return financeDb.transactionDao()
-    }
+    fun provideTransactionDao(financeDb: FinanceDB) = financeDb.transactionDao()
+
 
     @Provides
     @Singleton
-    fun provideFinanceDb(context: Context): FinanceDB {
-        return FinanceDB.getDB(context)
-    }
+    fun provideFinanceDb(context: Context) = FinanceDB.getDB(context)
+
+
+    @Provides
+    @Singleton
+    fun provideAddGoalUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        AddGoalUseCase(financeRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideAddTransactionUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        AddTransactionUseCase(financeRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideAllAmountUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        AllAmountUseCase(financeRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideDeleteGoalUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        DeleteGoalUseCase(financeRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideGetGoalUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        GetGoalProgressUseCase(financeRepositoryInterface)
+
+    @Provides
+    @Singleton
+    fun provideGetTransactionsUseCase(financeRepositoryInterface: FinanceRepositoryInterface) =
+        GetTransactionsUseCase(financeRepositoryInterface)
 }
 
 
@@ -258,6 +293,10 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsNotesRepository(notesRepository: NotesRepository): NoteRepositoryInterface
+
+    @Binds
+    @Singleton
+    fun bindFinanceRepository(financeRepository: FinanceRepository): FinanceRepositoryInterface
 }
 
 

@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.apis.data.NewsViewModel
-import com.example.financedate.FinanceViewModel
+import com.example.financedate.data.FinanceViewModel
 import com.example.financeui.FinanceMainScreen
 import com.example.home.MainScreen
 import com.example.home.newsFeed.WebViewNews

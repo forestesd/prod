@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import com.example.apis.data.NewsViewModel
-import com.example.financedate.FinanceViewModel
+import com.example.financedate.data.FinanceViewModel
 import com.example.navigation.AppNavigation
 import com.example.notesdata.data.AddNoteViewModel
 import com.example.notesdata.data.NotesViewModel

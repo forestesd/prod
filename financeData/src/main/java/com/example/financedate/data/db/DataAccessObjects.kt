@@ -1,4 +1,4 @@
-package com.example.financedate.db
+package com.example.financedate.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete

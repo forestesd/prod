@@ -1,7 +1,8 @@
-package com.example.financedate
+package com.example.financedate.data.utils
 
-import com.example.financedate.db.GoalEntity
-import com.example.financedate.db.TransactionEntity
+import com.example.financedate.domain.models.AmountUi
+import com.example.financedate.data.db.GoalEntity
+import com.example.financedate.data.db.TransactionEntity
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat

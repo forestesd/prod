@@ -1,4 +1,4 @@
-package com.example.financedate.db
+package com.example.financedate.data.db
 
 import android.content.Context
 import androidx.room.Database

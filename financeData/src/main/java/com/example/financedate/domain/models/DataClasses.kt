@@ -1,7 +1,7 @@
-package com.example.financedate
+package com.example.financedate.domain.models
 
 import androidx.compose.ui.graphics.Color
-import com.example.financedate.db.GoalEntity
+import com.example.financedate.data.db.GoalEntity
 
 data class GoalWithProgress(
     val goal: GoalEntity,

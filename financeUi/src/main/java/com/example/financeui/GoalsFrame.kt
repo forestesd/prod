@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Surface
@@ -29,9 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.financedate.FinanceViewModel
-import com.example.financedate.GoalWithProgress
-import com.example.financedate.formatedBigDecimalWithSpaces
+import com.example.financedate.data.FinanceViewModel
+import com.example.financedate.domain.models.GoalWithProgress
+import com.example.financedate.data.utils.formatedBigDecimalWithSpaces
 
 @Composable
 fun GoalObj(item: GoalWithProgress, financeViewModel: FinanceViewModel){

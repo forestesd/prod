@@ -1,16 +1,30 @@
-package com.example.financedate
+package com.example.financedate.data
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.example.financedate.db.GoalEntity
+import com.example.financedate.data.db.GoalEntity
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
+import com.example.financedate.domain.models.AmountUi
+import com.example.financedate.domain.models.GoalWithProgress
+import com.example.financedate.domain.models.TransactionUi
+import com.example.financedate.domain.use_cases.AddGoalUseCase
+import com.example.financedate.domain.use_cases.AddTransactionUseCase
+import com.example.financedate.domain.use_cases.AllAmountUseCase
+import com.example.financedate.domain.use_cases.DeleteGoalUseCase
+import com.example.financedate.domain.use_cases.GetGoalProgressUseCase
+import com.example.financedate.domain.use_cases.GetTransactionsUseCase
 import java.math.BigDecimal
 
 class FinanceViewModel @Inject constructor(
-    private val financeRepository: FinanceRepository
+    private val addGoalUseCase: AddGoalUseCase,
+    private val addTransactionUseCase: AddTransactionUseCase,
+    private val allAmountUseCase: AllAmountUseCase,
+    private val deleteGoalUseCase: DeleteGoalUseCase,
+    private val getGoalProgressUseCase: GetGoalProgressUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase
 ) : ViewModel() {
 
     private val _allTransactions = mutableStateOf<List<TransactionUi>>(emptyList())
@@ -24,7 +38,11 @@ class FinanceViewModel @Inject constructor(
 
     fun addGoal(name: String, targetCost: BigDecimal, deadLine: String?) {
         viewModelScope.launch {
-            financeRepository.addGoal(name, targetCost, deadLine)
+            addGoalUseCase.invoke(
+                name = name,
+                targetCost = targetCost,
+                deadLine = deadLine
+            )
             getGoalProgress()
             allAmount()
         }
@@ -34,20 +52,20 @@ class FinanceViewModel @Inject constructor(
 
     fun getGoalProgress() {
         viewModelScope.launch {
-            _goalsWithProgress.value = financeRepository.getGoalProgress()
+            _goalsWithProgress.value = getGoalProgressUseCase.invoke()
         }
     }
 
     fun deleteGoal(goal: GoalEntity) {
         viewModelScope.launch {
-            financeRepository.deleteGoal(goal)
+            deleteGoalUseCase.invoke(goal)
             getGoalProgress()
         }
     }
 
     fun addTransaction(goalName: String, amount: BigDecimal, type: String, comment: String?) {
         viewModelScope.launch {
-            financeRepository.addTransaction(
+            addTransactionUseCase.invoke(
                 goalName = goalName,
                 amount = amount,
                 type = type,
@@ -58,7 +76,7 @@ class FinanceViewModel @Inject constructor(
 
     fun getTransactions() {
         viewModelScope.launch {
-            _allTransactions.value = financeRepository.getTransactions()
+            _allTransactions.value = getTransactionsUseCase.invoke()
             getGoalProgress()
             getTransactions()
             allAmount()
@@ -67,7 +85,7 @@ class FinanceViewModel @Inject constructor(
 
     fun allAmount() {
         viewModelScope.launch {
-            _allAmount.value = financeRepository.allAmount()
+            _allAmount.value = allAmountUseCase.invoke()
         }
     }
 

@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.financedate.GoalWithProgress
+import com.example.financedate.domain.models.GoalWithProgress
 import java.math.BigDecimal
 
 @Composable

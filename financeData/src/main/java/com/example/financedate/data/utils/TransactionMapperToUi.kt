@@ -1,6 +1,7 @@
-package com.example.financedate
+package com.example.financedate.data.utils
 
-import com.example.financedate.db.TransactionEntity
+import com.example.financedate.domain.models.TransactionUi
+import com.example.financedate.data.db.TransactionEntity
 
 fun transactionMapperToUi(goalName: String, transaction: TransactionEntity): TransactionUi {
     return TransactionUi(

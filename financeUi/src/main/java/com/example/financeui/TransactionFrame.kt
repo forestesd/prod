@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financedate.TransactionUi
+import com.example.financedate.domain.models.TransactionUi
 
 @Composable
 fun TransactionObj(item: TransactionUi) {

@@ -1,10 +1,16 @@
-package com.example.financedate
+package com.example.financedate.data.repository
 
 import androidx.compose.ui.graphics.Color
-import com.example.financedate.db.GoalDAO
-import com.example.financedate.db.GoalEntity
-import com.example.financedate.db.TransactionDao
-import com.example.financedate.db.TransactionEntity
+import com.example.financedate.domain.models.AmountUi
+import com.example.financedate.domain.models.GoalWithProgress
+import com.example.financedate.domain.models.TransactionUi
+import com.example.financedate.data.db.GoalDAO
+import com.example.financedate.data.db.GoalEntity
+import com.example.financedate.data.db.TransactionDao
+import com.example.financedate.data.db.TransactionEntity
+import com.example.financedate.data.utils.amountMapperUi
+import com.example.financedate.data.utils.transactionMapperToUi
+import com.example.financedate.domain.repository.FinanceRepositoryInterface
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
@@ -14,14 +20,14 @@ import javax.inject.Inject
 class FinanceRepository @Inject constructor(
     private val transactionDao: TransactionDao,
     private val goalDAO: GoalDAO,
-) {
-    suspend fun addGoal(name: String, targetCost: BigDecimal, deadLine: String?) {
+) : FinanceRepositoryInterface {
+    override suspend fun addGoal(name: String, targetCost: BigDecimal, deadLine: String?) {
         val goal = GoalEntity(name = name, totalCoastTarget = targetCost, deadLine = deadLine)
         goalDAO.insert(goal)
 
     }
 
-    suspend fun getGoalProgress(): List<GoalWithProgress> {
+    override suspend fun getGoalProgress(): List<GoalWithProgress> {
         val allGoals = goalDAO.getAllGoals()
 
         return allGoals.map { goal ->
@@ -39,7 +45,7 @@ class FinanceRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteGoal(goal: GoalEntity) {
+    override suspend fun deleteGoal(goal: GoalEntity) {
         if (goal.currentCollected.toInt() > 0) {
             addTransaction(goal.name, goal.currentCollected, type = "Снятие", comment = null)
             goalDAO.delete(goal)
@@ -50,7 +56,7 @@ class FinanceRepository @Inject constructor(
 
     }
 
-    suspend fun addTransaction(
+    override suspend fun addTransaction(
         goalName: String,
         amount: BigDecimal,
         type: String,
@@ -74,14 +80,14 @@ class FinanceRepository @Inject constructor(
 
     }
 
-    suspend fun getTransactions(): List<TransactionUi> {
+    override suspend fun getTransactions(): List<TransactionUi> {
         val transactions = transactionDao.getAllTransactions()
         return transactions.map { transaction ->
             transactionMapperToUi(transaction.goalName, transaction)
         }
     }
 
-    suspend fun allAmount(): AmountUi {
+    override suspend fun allAmount(): AmountUi {
         val goals = goalDAO.getAllGoals()
         val transactions = transactionDao.getAllTransactions()
         return amountMapperUi(transactions, goals)
