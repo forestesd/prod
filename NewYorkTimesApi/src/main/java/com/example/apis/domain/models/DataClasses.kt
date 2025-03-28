@@ -10,7 +10,8 @@ data class TimesResponse(
 data class NewsUi(
     var news: List<Article>,
     var filters: List<String>,
-    var selectedSection: String
+    var selectedSection: String,
+    val page: Int = 0
 )
 
 data class Article(
@@ -54,5 +55,5 @@ data class HeadLine(
 
 data class CacheNews(
     val section: String,
-    val news: List<Docs>
+    val pages: Map<Int, List<Docs>> = emptyMap()
 )

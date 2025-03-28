@@ -29,7 +29,7 @@ fun docsMapperToArticle(
         url = news.web_url,
         abstract = news.abstract,
         source = news.source.toString(),
-        subsection = news.subsection_name.toString(),
+        subsection = if ( news.subsection_name != null ) news.subsection_name.toString() else "",
         published_date = pubDate,
         multimedia = multiMedia
     )
