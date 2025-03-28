@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.example.apis.R
 import com.example.apis.data.TimesApiService
 import com.example.apis.domain.models.Article
+import com.example.apis.domain.models.CacheNews
 import com.example.apis.domain.models.Docs
 import com.example.apis.domain.repository.NewsRepositoryInterface
 import kotlinx.coroutines.Dispatchers
@@ -20,29 +21,44 @@ class NewsRepository @Inject constructor(
     @Named("searchApi") val searchApiService: TimesApiService,
     private val context: Context
 ) : NewsRepositoryInterface {
-    private var cachedNews = mutableStateOf<List<Article>>(emptyList())
+    private var cachedNews = mutableStateOf<List<CacheNews>>(emptyList())
     private var lastUpdateTime = 0L
     private val cacheDuration = 6 * 60 * 60 * 1000L
 
-    override suspend fun getNews(source: String, section: String, apiKey: String): List<Article> {
+    override suspend fun getNews(source: String, apiKey: String, section: String): List<Docs> {
         val currentTime = System.currentTimeMillis()
 
-        if ((currentTime - lastUpdateTime) < cacheDuration && cachedNews.value.isNotEmpty()) {
-            return cachedNews.value
+        if (
+            (currentTime - lastUpdateTime) < cacheDuration
+            && cachedNews.value.isNotEmpty()
+            && cachedNews.value.any { it.section == section }
+        ) {
+            return cachedNews.value.find { it.section == section }!!.news
         }
-
+        val filterQuery = when (section) {
+            "All" -> "type_of_material:(\"News\")"
+            "Technology" -> "news_desk:(\"Technology\" \"Science\" \"Tech\")"
+            else -> "news_desk:(\"$section\") AND type_of_material:(\"News\")"
+        }
         return try {
-            val response = withContext(Dispatchers.IO) {
-                timesApiService.getNews(source, section, apiKey)
-            }
+            val res = searchApiService.searchNews(
+                filterQuery = filterQuery,
+                apiKey = apiKey
+            )
 
-            cachedNews.value = response.results
+            cachedNews.value = if (cachedNews.value.any { it.section == section }) {
+                cachedNews.value.map {
+                    if (it.section == section) it.copy(news = res.response.docs) else it
+                }
+            } else {
+                cachedNews.value + CacheNews(section, res.response.docs)
+            }
             lastUpdateTime = System.currentTimeMillis()
 
-            response.results
+            res.response.docs
 
         } catch (e: Exception) {
-            cachedNews.value
+            cachedNews.value.flatMap { it.news }
         }
     }
 
@@ -50,19 +66,31 @@ class NewsRepository @Inject constructor(
         source: String,
         section: String,
         apiKey: String
-    ): List<Article> {
+    ): List<Docs> {
+
+        val filterQuery = when (section) {
+            "All" -> "type_of_material:(\"News\")"
+            "Technology" -> "news_desk:(\"Technology\" \"Science\" \"Tech\")"
+            else -> "news_desk:(\"$section\") AND type_of_material:(\"News\")"
+        }
+
         return try {
             val response = withContext(Dispatchers.IO) {
-                timesApiService.getNews(source, section, apiKey)
+                searchApiService.searchNews(
+                    filterQuery = filterQuery,
+                    apiKey = apiKey
+                )
             }
 
-            cachedNews.value = response.results
+            cachedNews.value = cachedNews.value.map {
+                if (it.section == section) it.copy(news = response.response.docs) else it
+            }
             lastUpdateTime = System.currentTimeMillis()
 
-            response.results
+            response.response.docs
 
         } catch (e: Exception) {
-            cachedNews.value
+            cachedNews.value.flatMap { it.news }
         }
     }
 
@@ -72,7 +100,10 @@ class NewsRepository @Inject constructor(
     ): List<Docs> {
         var responseList: List<Docs> = emptyList()
         try {
-            val res = searchApiService.searchNews(q, apiKey)
+            val res = searchApiService.searchNews(
+                q = q,
+                apiKey = apiKey
+            )
             responseList = res.response.docs
         } catch (_: HttpException) {
 

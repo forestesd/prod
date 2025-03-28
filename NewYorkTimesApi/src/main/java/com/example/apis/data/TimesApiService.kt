@@ -16,7 +16,9 @@ interface TimesApiService {
 
     @GET("articlesearch.json")
     suspend fun searchNews(
-        @Query ("q") q: String,
+        @Query ("q") q: String?="",
+        @Query("fq") filterQuery: String? = null,
+        @Query("page") page: Int? = 0,
         @Query ("api-key") apiKey: String
     ): SearchTimesResponse
 }

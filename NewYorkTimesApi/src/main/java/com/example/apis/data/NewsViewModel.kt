@@ -12,6 +12,7 @@ import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -27,7 +28,8 @@ class NewsViewModel @Inject constructor(
     private val _news = MutableStateFlow(
         NewsUi(
             news = emptyList(),
-            filters = emptyList()
+            filters = emptyList(),
+            selectedSection = "All"
         )
     )
     val news: StateFlow<NewsUi> = _news
@@ -45,10 +47,17 @@ class NewsViewModel @Inject constructor(
         loadFilters()
     }
 
-    private fun loadFilters(){
+    private fun loadFilters() {
         viewModelScope.launch {
             _news.value.filters = getFiltersUseCase.invoke()
         }
+    }
+
+    fun changeSelectedFilter(filter: String) {
+        if (filter == news.value.selectedSection) return
+
+        loadNews(filter)
+        _news.update { it.copy(selectedSection = filter) }
     }
 
     private fun validateNews(newsList: List<Article>): List<Article> {
@@ -72,13 +81,30 @@ class NewsViewModel @Inject constructor(
     }
 
 
-    fun loadNews() {
+    fun loadNews(section: String = "All") {
         viewModelScope.launch {
             _isLoading.value = true
 
             val newsList =
-                getNewsUseCase.invoke("nyt", "world", "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
-            _news.value.news = validateNews(newsList)
+                getNewsUseCase.invoke(
+                    source = "nyt",
+                    section = section,
+                    apiKey = "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg"
+                )
+                    .sortedByDescending {
+                        try {
+                            val formattedDate = it.pub_date.replaceFirst(
+                                "(\\d{2})(\\d{2})$".toRegex(), "$1:$2"
+                            )
+                            OffsetDateTime.parse(
+                                formattedDate,
+                                DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+            _news.value.news = validateSearchNews(newsList)
 
             _isLoading.value = false
 
@@ -95,8 +121,21 @@ class NewsViewModel @Inject constructor(
                     "nyt",
                     "world",
                     "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg"
-                )
-            _news.value.news = validateNews(newsList)
+                ).sortedByDescending {
+                    try {
+                        val formattedDate = it.pub_date.replaceFirst(
+                            "(\\d{2})(\\d{2})$".toRegex(), "$1:$2"
+                        )
+                        OffsetDateTime.parse(
+                            formattedDate,
+                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                        )
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+
+            _news.value.news = validateSearchNews(newsList)
 
             _isLoading.value = false
 

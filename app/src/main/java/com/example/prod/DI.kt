@@ -80,11 +80,13 @@ class TimesApiModule {
     fun provideNewsViewModel(
         getNewsUseCase: GetNewsUseCase,
         getNewsPullToRefreshUseCase: GetNewsPullToRefreshUseCase,
-        getSearchNewsUseCase: GetSearchNewsUseCase
+        getSearchNewsUseCase: GetSearchNewsUseCase,
+        getFiltersUseCase: GetFiltersUseCase
     ) = NewsViewModel(
         getNewsUseCase = getNewsUseCase,
         getNewsPullToRefreshUseCase = getNewsPullToRefreshUseCase,
-        getSearchNewsUseCase = getSearchNewsUseCase
+        getSearchNewsUseCase = getSearchNewsUseCase,
+        getFiltersUseCase = getFiltersUseCase
     )
 
 

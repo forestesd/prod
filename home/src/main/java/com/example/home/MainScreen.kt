@@ -3,6 +3,7 @@ package com.example.home
 import android.widget.Spinner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -143,10 +145,23 @@ fun MainScreen(
 
             item {
                 LazyRow(
-                   modifier =  Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
-
+                    items(news.filters, key = { item -> item }) { item ->
+                        FilterChip(
+                            selected = item == news.selectedSection,
+                            onClick = { newsViewModel.changeSelectedFilter(item) },
+                            label = {
+                                Text(
+                                    text = item
+                                )
+                            }
+                        )
+                    }
                 }
 
             }
@@ -163,7 +178,7 @@ fun MainScreen(
 
             } else {
                 items(
-                    if (isSearchingNews) serchNews else news,
+                    if (isSearchingNews) serchNews else news.news,
                     key = { item -> item.title }) { item ->
                     NewsCard(
                         item, newsViewModel

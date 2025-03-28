@@ -10,6 +10,7 @@ data class TimesResponse(
 data class NewsUi(
     var news: List<Article>,
     var filters: List<String>,
+    var selectedSection: String
 )
 
 data class Article(
@@ -51,3 +52,7 @@ data class HeadLine(
     val main: String?
 )
 
+data class CacheNews(
+    val section: String,
+    val news: List<Docs>
+)
