@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import com.example.apis.data.NewsViewModel
 import com.example.apis.data.RetrofitSearchTimesInstance
-import com.example.apis.data.RetrofitTimesInstance
 import com.example.apis.data.TimesApiService
 import com.example.apis.data.repository.NewsRepository
 import com.example.apis.domain.repository.NewsRepositoryInterface
@@ -13,8 +12,6 @@ import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
 import com.example.apis.domain.use_cases.GetSearchNewsUseCase
 import com.example.financedate.data.db.FinanceDB
-import com.example.financedate.data.db.GoalDAO
-import com.example.financedate.data.db.TransactionDao
 import com.example.financedate.data.repository.FinanceRepository
 import com.example.financedate.domain.repository.FinanceRepositoryInterface
 import com.example.financedate.domain.use_cases.AddGoalUseCase
@@ -56,12 +53,6 @@ class TimesApiModule {
 
     @Provides
     @Singleton
-    @Named("newsApi")
-    fun provideTimesApiService() = RetrofitTimesInstance.api
-
-
-    @Provides
-    @Singleton
     @Named("searchApi")
     fun provideSearchApiService() = RetrofitSearchTimesInstance.api
 
@@ -69,10 +60,9 @@ class TimesApiModule {
     @Provides
     @Singleton
     fun provideNewsRepository(
-        @Named("newsApi") timesApiService: TimesApiService,
         @Named("searchApi") searchApiService: TimesApiService,
         context: Context
-    ) = NewsRepository(timesApiService, searchApiService, context)
+    ) = NewsRepository(searchApiService, context)
 
 
     @Provides
