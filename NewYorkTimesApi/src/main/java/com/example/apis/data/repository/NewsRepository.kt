@@ -40,7 +40,11 @@ class NewsRepository @Inject constructor(
             cachedNews.value.any { it.section == section } &&
             cachedNews.value.find { it.section == section }?.pages?.containsKey(page) == true
         ) {
-            return cachedNews.value.find { it.section == section }!!.pages[page]!!
+            return cachedNews.value
+                .find { it.section == section }!!
+                .pages
+                .toSortedMap()
+                .flatMap { it.value }
         }
         val filterQuery = when (section) {
             "All" -> "type_of_material:(\"News\")"

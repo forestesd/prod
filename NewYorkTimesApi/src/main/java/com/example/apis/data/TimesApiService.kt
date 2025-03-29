@@ -12,6 +12,7 @@ interface TimesApiService {
         @Query ("q") q: String?="",
         @Query("fq") filterQuery: String? = null,
         @Query("page") page: Int? = 0,
+        @Query("sort") sort: String = "newest",
         @Query ("api-key") apiKey: String
     ): SearchTimesResponse
 }
