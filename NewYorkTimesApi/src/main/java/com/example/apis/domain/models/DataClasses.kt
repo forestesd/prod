@@ -57,3 +57,12 @@ data class CacheNews(
     val section: String,
     val pages: Map<Int, List<Docs>> = emptyMap()
 )
+enum class SearchType{
+    News,
+    Tickers;
+
+    fun toggle(): SearchType = when (this) {
+        News -> Tickers
+        Tickers -> News
+    }
+}

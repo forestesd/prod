@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apis.data.NewsViewModel
+import com.example.apis.domain.models.SearchType
 import com.example.tickersapi.data.TickersViewModel
 import kotlinx.coroutines.delay
 
@@ -39,9 +41,11 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(newsViewModel: NewsViewModel, tickersViewModel: TickersViewModel) {
+
     var query by remember { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val isSearching by newsViewModel.isSearching.collectAsState()
+    val searchType by newsViewModel.searchType.collectAsState()
     if (!isSearching){
         Text(
             text = "Главная",
@@ -119,4 +123,22 @@ fun SearchScreen(newsViewModel: NewsViewModel, tickersViewModel: TickersViewMode
             }
         }
     }
+    if (isSearching){
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            listOf(SearchType.News,SearchType.Tickers).forEach {
+                FilterChip(
+                    selected = it == searchType,
+                    onClick = {
+                        newsViewModel.changeSearchType()
+                    },
+                    label = { Text(it.name)},
+                )
+            }
+        }
+    }
+
 }

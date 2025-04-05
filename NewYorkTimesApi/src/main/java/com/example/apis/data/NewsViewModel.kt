@@ -6,6 +6,7 @@ import com.example.apis.data.utils.docsMapperToArticle
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs
 import com.example.apis.domain.models.NewsUi
+import com.example.apis.domain.models.SearchType
 import com.example.apis.domain.use_cases.GetFiltersUseCase
 import com.example.apis.domain.use_cases.GetNewsPullToRefreshUseCase
 import com.example.apis.domain.use_cases.GetNewsUseCase
@@ -44,9 +45,15 @@ class NewsViewModel @Inject constructor(
 
     private var _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching
+    private var _searchType = MutableStateFlow(SearchType.News)
+    val searchType: StateFlow<SearchType> = _searchType
 
     init {
         loadFilters()
+    }
+
+    fun changeSearchType(){
+        _searchType.update { currentType -> currentType.toggle() }
     }
 
     private fun loadFilters() {

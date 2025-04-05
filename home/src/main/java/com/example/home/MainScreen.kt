@@ -1,6 +1,5 @@
 package com.example.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,12 +30,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.apis.domain.models.Article
 import com.example.apis.data.NewsViewModel
+import com.example.apis.domain.models.Article
+import com.example.apis.domain.models.SearchType
 import com.example.home.newsFeed.NewsCard
 import com.example.home.search.SearchScreen
 import com.example.home.shimmer.NewsShimmerListItem
 import com.example.home.shimmer.TickersShimmer
+import com.example.home.tickers.CardTicker
 import com.example.home.tickers.TickersFeedMain
 import com.example.tickersapi.data.TickersViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -53,7 +54,7 @@ fun MainScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val pullToRefreshState = rememberPullToRefreshState()
-
+    val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
     LaunchedEffect(Unit) {
         newsViewModel.loadNews()
         tickersViewModel.loadTickers()
@@ -61,15 +62,19 @@ fun MainScreen(
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
             newsViewModel.loadNewsPullToRefresh()
-            tickersViewModel.loadTickers()
+            if (!isSearchingTickers){
+                tickersViewModel.loadTickers()
+            }
+
         }
 
     }
     val tickersLoading by tickersViewModel.isLoading.collectAsState()
     val newsLoading by newsViewModel.isLoading.collectAsState()
-    val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
+
     val isSearchingNews by newsViewModel.isSearching.collectAsState()
 
+    val searchType by newsViewModel.searchType.collectAsState()
 
     val isLoading = newsLoading || tickersLoading
 
@@ -122,9 +127,10 @@ fun MainScreen(
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
             }
 
-            item {
-                if (tickersLoading) {
-                    if (!isSearchingTickers) {
+
+            if (tickersLoading) {
+                if (!isSearchingTickers) {
+                    item {
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -141,10 +147,14 @@ fun MainScreen(
                                 )
                             }
                         }
-                    } else {
-                        val cardHeight = 82.dp
-                        val visibleCards = 3
-                        val totalHeight = cardHeight * visibleCards
+                    }
+
+                } else if (searchType == SearchType.Tickers) {
+                    val cardHeight = 82.dp
+                    val visibleCards = 3
+                    val totalHeight = cardHeight * visibleCards
+
+                    item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -165,10 +175,20 @@ fun MainScreen(
                         }
                     }
 
+                }
+
+            } else {
+                if (isSearchingTickers && tickers.isNotEmpty() && searchType == SearchType.Tickers) {
+                    items(tickers, key = { item -> item.symbol }) { item ->
+                        CardTicker(item, true, Modifier  .padding(horizontal = 10.dp).padding(bottom = 10.dp))
+                    }
                 } else {
-                    TickersFeedMain(tickers, tickersViewModel)
+                    item {
+                        TickersFeedMain(tickers, tickersViewModel, searchType)
+                    }
                 }
             }
+
             if (!isSearchingNews) {
                 item {
                     LazyRow(
@@ -204,7 +224,8 @@ fun MainScreen(
                     )
                 }
 
-            } else {
+            }
+            if (!newsLoading and !isSearchingNews) {
                 items(
                     if (isSearchingNews) serchNews else news.news,
                     key = { item -> item.title }) { item ->
@@ -216,7 +237,28 @@ fun MainScreen(
                         )
                     }
                 }
-                if (isMoreLoading){
+                if (isMoreLoading) {
+                    items(3) {
+                        NewsShimmerListItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                }
+            } else if (searchType == SearchType.News) {
+                items(
+                    if (isSearchingNews) serchNews else news.news,
+                    key = { item -> item.title }) { item ->
+                    NewsCard(
+                        item, newsViewModel
+                    ) {
+                        onCardClicked(
+                            item
+                        )
+                    }
+                }
+                if (isMoreLoading) {
                     items(3) {
                         NewsShimmerListItem(
                             modifier = Modifier

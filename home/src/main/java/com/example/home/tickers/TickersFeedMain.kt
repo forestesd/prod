@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,16 +28,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.apis.domain.models.SearchType
 import com.example.home.R
-import com.example.tickersapi.domain.models.TickerUi
 import com.example.tickersapi.data.TickersViewModel
+import com.example.tickersapi.domain.models.TickerUi
 
 @Composable
-fun TickersFeedMain(tickers: List<TickerUi>, tickersViewModel: TickersViewModel) {
+fun TickersFeedMain(
+    tickers: List<TickerUi>,
+    tickersViewModel: TickersViewModel,
+    searchType: SearchType
+) {
 
     val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
 
-    if (isSearchingTickers && tickers.isNotEmpty()) {
+    if (isSearchingTickers && tickers.isNotEmpty() && searchType == SearchType.Tickers) {
         SearchTickersFeed(tickers)
     } else if (!isSearchingTickers) {
         MainTickersFeed(tickers)
@@ -55,24 +61,19 @@ fun MainTickersFeed(tickers: List<TickerUi>) {
 
         ) {
         items(tickers, key = { item -> item.symbol }) { item ->
-            CardTicker(item, false)
+            CardTicker(item, false, Modifier.padding(end = 10.dp, bottom = 0.dp))
         }
-
-
     }
 }
 
 @Composable
 fun SearchTickersFeed(tickers: List<TickerUi>) {
 
-    val cardHeight = 82.dp
-    val visibleCards = 3
-    val totalHeight = cardHeight * visibleCards
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(totalHeight)
+            .wrapContentHeight()
             .padding(horizontal = 16.dp)
             .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Top,
@@ -85,14 +86,14 @@ fun SearchTickersFeed(tickers: List<TickerUi>) {
 }
 
 @Composable
-fun CardTicker(item: TickerUi, isSearch: Boolean) {
+fun CardTicker(item: TickerUi, isSearch: Boolean, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentWidth()
             .height(80.dp)
-            .padding(end = 10.dp, bottom = if (isSearch) 5.dp else 0.dp),
 
-        ) {
+
+    ) {
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
