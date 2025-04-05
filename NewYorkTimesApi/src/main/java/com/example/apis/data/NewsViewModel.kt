@@ -2,6 +2,7 @@ package com.example.apis.data
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.apis.data.utils.Const
 import com.example.apis.data.utils.docsMapperToArticle
 import com.example.apis.domain.models.Article
 import com.example.apis.domain.models.Docs
@@ -90,7 +91,7 @@ class NewsViewModel @Inject constructor(
                 getNewsUseCase.invoke(
                     source = "nyt",
                     section = section,
-                    apiKey = "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg",
+                    apiKey = Const.NYT_API_KEY,
                     page = _news.value.page
                 )
 
@@ -110,7 +111,7 @@ class NewsViewModel @Inject constructor(
                 getNewsUseCase.invoke(
                     source = "nyt",
                     section = section,
-                    apiKey = "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg",
+                    apiKey = Const.NYT_API_KEY,
                     page = _news.value.page
                 )
 
@@ -130,7 +131,7 @@ class NewsViewModel @Inject constructor(
                 getNewsPullToRefreshUseCase.invoke(
                     "nyt",
                     "world",
-                    "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg"
+                    Const.NYT_API_KEY
                 ).sortedByDescending {
                     try {
                         val formattedDate = it.pub_date.replaceFirst(
@@ -156,7 +157,7 @@ class NewsViewModel @Inject constructor(
         if (q.length >= 2) {
             viewModelScope.launch {
                 _isLoading.value = true
-                val newsList = getSearchNewsUseCase.invoke(q, "zdriWPTRBqSbP75bHAG4LQY1atLj26Dg")
+                val newsList = getSearchNewsUseCase.invoke(q, Const.NYT_API_KEY)
                     .sortedByDescending {
                         try {
                             val formattedDate = it.pub_date.replaceFirst(

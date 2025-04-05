@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tickersapi.domain.models.TickerUi
 import com.example.tickersapi.data.remote.TickersWebSocket
+import com.example.tickersapi.data.utils.Const
 import com.example.tickersapi.domain.use_cases.GetCompanyInfoUseCase
 import com.example.tickersapi.domain.use_cases.SearchCompanyUseCase
 import com.example.tickersapi.domain.use_cases.WebSocketOpenUseCase
@@ -57,7 +58,7 @@ class TickersViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
 
-            _tickers.value = getCompanyInfoUseCase.invoke("cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg")
+            _tickers.value = getCompanyInfoUseCase.invoke(Const.FINNHUB_API_KEY)
 
             _isLoading.value = false
         }
@@ -70,7 +71,7 @@ class TickersViewModel @Inject constructor(
             _tickers.value = searchCompanyUseCase.invoke(
                 q = q,
                 exchange = "US",
-                apiKey = "cuobpm9r01qve8psc3f0cuobpm9r01qve8psc3fg"
+                apiKey = Const.FINNHUB_API_KEY
             )
 
             _isLoading.value = false
