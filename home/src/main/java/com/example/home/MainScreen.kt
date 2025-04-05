@@ -1,5 +1,7 @@
 package com.example.home
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.example.apis.data.NewsViewModel
 import com.example.apis.domain.models.Article
@@ -62,7 +66,7 @@ fun MainScreen(
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
             newsViewModel.loadNewsPullToRefresh()
-            if (!isSearchingTickers){
+            if (!isSearchingTickers) {
                 tickersViewModel.loadTickers()
             }
 
@@ -179,8 +183,31 @@ fun MainScreen(
 
             } else {
                 if (isSearchingTickers && tickers.isNotEmpty() && searchType == SearchType.Tickers) {
+
                     items(tickers, key = { item -> item.symbol }) { item ->
-                        CardTicker(item, true, Modifier  .padding(horizontal = 10.dp).padding(bottom = 10.dp))
+                        val scale = remember { Animatable(0.9f) }
+                        val alpha = remember { Animatable(0.0f) }
+
+                        LaunchedEffect(key1 = true) {
+                            alpha.animateTo(
+                                targetValue = 1f,
+                                animationSpec = tween(durationMillis = 500)
+                            )
+
+                            scale.animateTo(
+                                targetValue = 1f,
+                                animationSpec = tween(durationMillis = 300)
+                            )
+                        }
+                        CardTicker(
+                            item,
+                            true,
+                            Modifier
+                                .padding(horizontal = 10.dp)
+                                .padding(bottom = 10.dp)
+                                .alpha(alpha.value)
+                                .scale(scale.value)
+                        )
                     }
                 } else {
                     item {
@@ -225,6 +252,7 @@ fun MainScreen(
                 }
 
             }
+
             if (!newsLoading and !isSearchingNews) {
                 items(
                     if (isSearchingNews) serchNews else news.news,

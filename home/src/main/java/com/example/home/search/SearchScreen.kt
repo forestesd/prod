@@ -98,12 +98,26 @@ fun SearchScreen(newsViewModel: NewsViewModel, tickersViewModel: TickersViewMode
             ) {
 
             }
+            LaunchedEffect(searchType) {
+                if (query.isNotEmpty()) {
+                    if (searchType == SearchType.News){
+                        newsViewModel.loadSearchNews(query)
+                    }else{
+                        tickersViewModel.searchTickers(query)
+                    }
 
+                }
+
+            }
             LaunchedEffect(query) {
                 delay(500)
                 if (query.isNotEmpty()) {
-                    newsViewModel.loadSearchNews(query)
-                    tickersViewModel.searchTickers(query)
+                    if (searchType == SearchType.News){
+                        newsViewModel.loadSearchNews(query)
+                    }else{
+                        tickersViewModel.searchTickers(query)
+                    }
+
                 }
 
             }

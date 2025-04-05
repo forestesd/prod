@@ -1,5 +1,7 @@
 package com.example.home.tickers
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +20,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,9 +46,7 @@ fun TickersFeedMain(
 
     val isSearchingTickers by tickersViewModel.isSearching.collectAsState()
 
-    if (isSearchingTickers && tickers.isNotEmpty() && searchType == SearchType.Tickers) {
-        SearchTickersFeed(tickers)
-    } else if (!isSearchingTickers) {
+    if (!isSearchingTickers) {
         MainTickersFeed(tickers)
     }
 
@@ -52,6 +54,9 @@ fun TickersFeedMain(
 
 @Composable
 fun MainTickersFeed(tickers: List<TickerUi>) {
+
+
+
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,24 +71,6 @@ fun MainTickersFeed(tickers: List<TickerUi>) {
     }
 }
 
-@Composable
-fun SearchTickersFeed(tickers: List<TickerUi>) {
-
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 10.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(tickers, key = { item -> item.symbol }) { item ->
-            CardTicker(item, true)
-        }
-    }
-}
 
 @Composable
 fun CardTicker(item: TickerUi, isSearch: Boolean, modifier: Modifier = Modifier) {
