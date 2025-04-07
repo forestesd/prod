@@ -5,7 +5,10 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
+import android.util.Log
+import androidx.compose.ui.unit.dp
 import com.example.notesdata.data.db.NewsDao
 import com.example.notesdata.data.db.NewsEntity
 import com.example.notesdata.data.db.PostDao
@@ -89,45 +92,47 @@ class AddNoteRepository @Inject constructor(
         }
     }
 
-
     private suspend fun rotateImageIfNeeded(context: Context, imageUri: Uri): Uri =
         withContext(Dispatchers.IO) {
             val inputStream = context.contentResolver.openInputStream(imageUri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
 
+            val rotationDegrees = getRotationDegreesFromExif(imageUri, context)
             val matrix = Matrix()
-            val orientation = getImageOrientation(imageUri, context)
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                matrix.postRotate(90f)
+
+            if (rotationDegrees != 0) {
+                matrix.postRotate(rotationDegrees.toFloat())
             }
 
-            val rotatedBitmap =
-                Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 
             val fileName = "rotated_${System.currentTimeMillis()}.jpg"
             val file = File(context.getExternalFilesDir(null), fileName)
-            val outputStream = FileOutputStream(file)
-
-            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+            FileOutputStream(file).use { out ->
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
 
             Uri.fromFile(file)
         }
 
 
-    private fun getImageOrientation(imageUri: Uri, context: Context): Int {
+
+    private fun getRotationDegreesFromExif(imageUri: Uri, context: Context): Int {
         val inputStream = context.contentResolver.openInputStream(imageUri)
-        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        val exif = inputStream?.use { ExifInterface(it) }
 
-        BitmapFactory.decodeStream(inputStream, null, options)
-
-        return if (options.outWidth > options.outHeight) {
-            Configuration.ORIENTATION_LANDSCAPE
-        } else {
-            Configuration.ORIENTATION_PORTRAIT
+        return when (exif?.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
         }
     }
+
 
     private fun compressImage(context: Context, imageUri: Uri): Uri? {
         val quality = 40
