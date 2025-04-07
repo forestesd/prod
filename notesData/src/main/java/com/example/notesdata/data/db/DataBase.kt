@@ -37,7 +37,7 @@ abstract class PostDatabase : RoomDatabase() {
     private class PostDataBaseCallback :Callback(){
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            db.execSQL("INSERT INTO tags (name) VALUES ('Спорт'), ('Музыка'), ('Кино'), ('Образование'), ('Технологии')")
+            db.execSQL("INSERT INTO tags (name) VALUES ('Спорт'), ('Музыка'), ('Кино'), ('Образование'), ('Технологии'), ('PROD')")
         }
     }
 }
